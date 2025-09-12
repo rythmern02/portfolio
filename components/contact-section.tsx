@@ -1,12 +1,22 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Badge } from "@/components/ui/badge"
-import { Mail, Phone, MapPin, Github, Twitter, ExternalLink, Send, Calendar } from "lucide-react"
-import { useState } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Github,
+  Twitter,
+  ExternalLink,
+  Send,
+  Calendar,
+} from "lucide-react";
+import { useState } from "react";
+import Link from "next/link";
 
 export default function ContactSection() {
   const [formValues, setFormValues] = useState({
@@ -15,48 +25,67 @@ export default function ContactSection() {
     email: "",
     subject: "",
     message: "",
-  })
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [serverMessage, setServerMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [serverMessage, setServerMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
   function handleInputChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) {
-    const { name, value } = e.target
-    setFormValues((prev) => ({ ...prev, [name]: value }))
+    const { name, value } = e.target;
+    setFormValues((prev) => ({ ...prev, [name]: value }));
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setServerMessage(null)
+    e.preventDefault();
+    setServerMessage(null);
     if (!formValues.firstName || !formValues.email || !formValues.message) {
-      setServerMessage({ type: "error", text: "Please fill required fields." })
-      return
+      setServerMessage({ type: "error", text: "Please fill required fields." });
+      return;
     }
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formValues),
-      })
-      const data = await res.json()
+      });
+      const data = await res.json();
       if (!res.ok) {
-        throw new Error(data?.error || "Failed to send message.")
+        throw new Error(data?.error || "Failed to send message.");
       }
-      setServerMessage({ type: "success", text: "Thanks! Your message has been sent." })
-      setFormValues({ firstName: "", lastName: "", email: "", subject: "", message: "" })
+      setServerMessage({
+        type: "success",
+        text: "Thanks! Your message has been sent.",
+      });
+      setFormValues({
+        firstName: "",
+        lastName: "",
+        email: "",
+        subject: "",
+        message: "",
+      });
     } catch (err: any) {
-      setServerMessage({ type: "error", text: err?.message || "Something went wrong." })
+      setServerMessage({
+        type: "error",
+        text: err?.message || "Something went wrong.",
+      });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
   return (
     <section className="py-24 px-6 relative overflow-hidden">
       {/* Envelope Paper Background */}
       <div className="absolute inset-0 opacity-5">
-        <svg className="absolute top-0 left-0 w-full h-full" viewBox="0 0 1200 800" fill="none">
+        <svg
+          className="absolute top-0 left-0 w-full h-full"
+          viewBox="0 0 1200 800"
+          fill="none"
+        >
           <path
             d="M100,200 L600,100 L1100,200 L1100,600 L100,600 Z"
             fill="white"
@@ -65,8 +94,24 @@ export default function ContactSection() {
             className="animate-pulse"
           />
           {/* Envelope fold lines */}
-          <line x1="100" y1="200" x2="600" y2="400" stroke="white" strokeWidth="1" opacity="0.5" />
-          <line x1="1100" y1="200" x2="600" y2="400" stroke="white" strokeWidth="1" opacity="0.5" />
+          <line
+            x1="100"
+            y1="200"
+            x2="600"
+            y2="400"
+            stroke="white"
+            strokeWidth="1"
+            opacity="0.5"
+          />
+          <line
+            x1="1100"
+            y1="200"
+            x2="600"
+            y2="400"
+            stroke="white"
+            strokeWidth="1"
+            opacity="0.5"
+          />
         </svg>
       </div>
 
@@ -81,12 +126,56 @@ export default function ContactSection() {
       {/* Network Connection Lines */}
       <div className="absolute bottom-20 right-20 opacity-5">
         <svg width="200" height="200" viewBox="0 0 200 200" fill="none">
-          <circle cx="50" cy="50" r="4" fill="white" className="animate-pulse" />
-          <circle cx="150" cy="50" r="4" fill="white" className="animate-pulse" style={{ animationDelay: "0.5s" }} />
-          <circle cx="100" cy="150" r="4" fill="white" className="animate-pulse" style={{ animationDelay: "1s" }} />
-          <line x1="50" y1="50" x2="150" y2="50" stroke="white" strokeWidth="1" className="animate-pulse" />
-          <line x1="50" y1="50" x2="100" y2="150" stroke="white" strokeWidth="1" className="animate-pulse" />
-          <line x1="150" y1="50" x2="100" y2="150" stroke="white" strokeWidth="1" className="animate-pulse" />
+          <circle
+            cx="50"
+            cy="50"
+            r="4"
+            fill="white"
+            className="animate-pulse"
+          />
+          <circle
+            cx="150"
+            cy="50"
+            r="4"
+            fill="white"
+            className="animate-pulse"
+            style={{ animationDelay: "0.5s" }}
+          />
+          <circle
+            cx="100"
+            cy="150"
+            r="4"
+            fill="white"
+            className="animate-pulse"
+            style={{ animationDelay: "1s" }}
+          />
+          <line
+            x1="50"
+            y1="50"
+            x2="150"
+            y2="50"
+            stroke="white"
+            strokeWidth="1"
+            className="animate-pulse"
+          />
+          <line
+            x1="50"
+            y1="50"
+            x2="100"
+            y2="150"
+            stroke="white"
+            strokeWidth="1"
+            className="animate-pulse"
+          />
+          <line
+            x1="150"
+            y1="50"
+            x2="100"
+            y2="150"
+            stroke="white"
+            strokeWidth="1"
+            className="animate-pulse"
+          />
         </svg>
       </div>
 
@@ -96,10 +185,35 @@ export default function ContactSection() {
           {/* Letter paper background */}
           <div className="absolute inset-0 -z-10 opacity-10">
             <svg className="w-full h-full" viewBox="0 0 400 200" fill="none">
-              <rect x="50" y="40" width="300" height="120" fill="white" stroke="white" strokeWidth="1" rx="5" />
+              <rect
+                x="50"
+                y="40"
+                width="300"
+                height="120"
+                fill="white"
+                stroke="white"
+                strokeWidth="1"
+                rx="5"
+              />
               {/* Letter fold marks */}
-              <line x1="50" y1="80" x2="350" y2="80" stroke="white" strokeWidth="0.5" strokeDasharray="5,5" />
-              <line x1="50" y1="120" x2="350" y2="120" stroke="white" strokeWidth="0.5" strokeDasharray="5,5" />
+              <line
+                x1="50"
+                y1="80"
+                x2="350"
+                y2="80"
+                stroke="white"
+                strokeWidth="0.5"
+                strokeDasharray="5,5"
+              />
+              <line
+                x1="50"
+                y1="120"
+                x2="350"
+                y2="120"
+                stroke="white"
+                strokeWidth="0.5"
+                strokeDasharray="5,5"
+              />
             </svg>
           </div>
           <h2 className="text-4xl lg:text-5xl font-bold text-white relative">
@@ -121,7 +235,8 @@ export default function ContactSection() {
             </svg>
           </h2>
           <p className="text-xl text-gray-300 text-balance">
-            Ready to create the next generation of blockchain applications? Let's connect!
+            Ready to create the next generation of blockchain applications?
+            Let's connect!
           </p>
         </div>
 
@@ -131,7 +246,15 @@ export default function ContactSection() {
             {/* Notebook paper background */}
             <div className="absolute inset-0 opacity-5">
               <svg className="w-full h-full" viewBox="0 0 400 600" fill="none">
-                <rect x="20" y="20" width="360" height="560" fill="white" stroke="white" strokeWidth="2" />
+                <rect
+                  x="20"
+                  y="20"
+                  width="360"
+                  height="560"
+                  fill="white"
+                  stroke="white"
+                  strokeWidth="2"
+                />
                 {/* Notebook holes */}
                 <circle cx="50" cy="80" r="3" fill="black" />
                 <circle cx="50" cy="140" r="3" fill="black" />
@@ -156,9 +279,10 @@ export default function ContactSection() {
             <div className="space-y-6 relative z-10">
               <h3 className="text-2xl font-bold text-white">Get In Touch</h3>
               <p className="text-gray-200 leading-relaxed">
-                I'm always excited to discuss new opportunities, collaborate on innovative projects, or share insights
-                about the blockchain ecosystem. Whether you're looking for a developer, mentor, or community builder,
-                let's start a conversation.
+                I'm always excited to discuss new opportunities, collaborate on
+                innovative projects, or share insights about the blockchain
+                ecosystem. Whether you're looking for a developer, mentor, or
+                community builder, let's start a conversation.
               </p>
             </div>
 
@@ -196,9 +320,12 @@ export default function ContactSection() {
                   href: "https://github.com/rythmern02",
                 },
               ].map((contact, index) => {
-                const IconComponent = contact.icon
+                const IconComponent = contact.icon;
                 return (
-                  <div key={index} className="flex items-center gap-4 group relative">
+                  <div
+                    key={index}
+                    className="flex items-center gap-4 group relative"
+                  >
                     {/* Ink spot behind each contact item */}
                     <div
                       className="absolute -left-2 top-1/2 transform -translate-y-1/2 w-1 h-1 bg-white/20 rounded-full animate-pulse"
@@ -209,13 +336,18 @@ export default function ContactSection() {
                       <IconComponent className="w-5 h-5 text-white" />
                     </div>
                     <div className="space-y-1">
-                      <p className="text-sm font-medium text-gray-200">{contact.label}</p>
-                      <a href={contact.href} className="text-white hover:text-gray-300 transition-colors font-medium">
+                      <p className="text-sm font-medium text-gray-200">
+                        {contact.label}
+                      </p>
+                      <a
+                        href={contact.href}
+                        className="text-white hover:text-gray-300 transition-colors font-medium"
+                      >
                         {contact.value}
                       </a>
                     </div>
                   </div>
-                )
+                );
               })}
             </div>
 
@@ -223,29 +355,46 @@ export default function ContactSection() {
             <Card className="border-white/20 bg-white/5 relative overflow-hidden">
               {/* Stamp effect */}
               <div className="absolute top-2 right-2 w-16 h-12 border-2 border-white/30 rounded opacity-30">
-                <div className="text-xs text-white/50 text-center mt-2 font-mono">OPEN</div>
+                <div className="text-xs text-white/50 text-center mt-2 font-mono">
+                  OPEN
+                </div>
               </div>
 
               <CardContent className="p-6 space-y-4 relative z-10">
                 <div className="flex items-center gap-3">
                   <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
-                  <h4 className="font-semibold text-white">Available for New Opportunities</h4>
+                  <h4 className="font-semibold text-white">
+                    Available for New Opportunities
+                  </h4>
                 </div>
                 <p className="text-sm text-gray-200 leading-relaxed">
-                  Currently open to full-time positions, consulting projects, and collaboration opportunities in
-                  blockchain development, DevRel, and community building roles.
+                  Currently open to full-time positions, consulting projects,
+                  and collaboration opportunities in blockchain development,
+                  DevRel, and community building roles.
                 </p>
                 <div className="flex flex-wrap gap-2 pt-2">
-                  <Badge variant="secondary" className="bg-white/10 text-white border-white/20">
+                  <Badge
+                    variant="secondary"
+                    className="bg-white/10 text-white border-white/20"
+                  >
                     Full-time
                   </Badge>
-                  <Badge variant="secondary" className="bg-white/10 text-white border-white/20">
+                  <Badge
+                    variant="secondary"
+                    className="bg-white/10 text-white border-white/20"
+                  >
                     Consulting
                   </Badge>
-                  <Badge variant="secondary" className="bg-white/10 text-white border-white/20">
+                  <Badge
+                    variant="secondary"
+                    className="bg-white/10 text-white border-white/20"
+                  >
                     Remote
                   </Badge>
-                  <Badge variant="secondary" className="bg-white/10 text-white border-white/20">
+                  <Badge
+                    variant="secondary"
+                    className="bg-white/10 text-white border-white/20"
+                  >
                     Hybrid
                   </Badge>
                 </div>
@@ -271,7 +420,9 @@ export default function ContactSection() {
               <form className="space-y-4" onSubmit={handleSubmit} noValidate>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-white">First Name</label>
+                    <label className="text-sm font-medium text-white">
+                      First Name
+                    </label>
                     <Input
                       name="firstName"
                       placeholder="John"
@@ -282,7 +433,9 @@ export default function ContactSection() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-white">Last Name</label>
+                    <label className="text-sm font-medium text-white">
+                      Last Name
+                    </label>
                     <Input
                       name="lastName"
                       placeholder="Doe"
@@ -294,7 +447,9 @@ export default function ContactSection() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-white">Email</label>
+                  <label className="text-sm font-medium text-white">
+                    Email
+                  </label>
                   <Input
                     name="email"
                     type="email"
@@ -307,7 +462,9 @@ export default function ContactSection() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-white">Subject</label>
+                  <label className="text-sm font-medium text-white">
+                    Subject
+                  </label>
                   <Input
                     name="subject"
                     placeholder="Let's discuss a blockchain project"
@@ -318,7 +475,9 @@ export default function ContactSection() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-white">Message</label>
+                  <label className="text-sm font-medium text-white">
+                    Message
+                  </label>
                   <Textarea
                     name="message"
                     placeholder="Tell me about your project, opportunity, or how we can collaborate..."
@@ -356,10 +515,15 @@ export default function ContactSection() {
               <div className="text-center pt-4">
                 <p className="text-sm text-gray-200">
                   Prefer a quick call?
-                  <Button variant="link" className="text-white hover:text-gray-300 p-0 ml-1 h-auto">
-                    <Calendar className="w-3 h-3 mr-1" />
-                    Schedule a meeting
-                  </Button>
+                  <Link href={"https://calendly.com/rythme/30min"}>
+                    <Button
+                      variant="link"
+                      className="text-white hover:text-gray-300 p-0 ml-1 h-auto"
+                    >
+                      <Calendar className="w-3 h-3 mr-1" />
+                      Schedule a meeting
+                    </Button>
+                  </Link>
                 </p>
               </div>
             </CardContent>
@@ -371,33 +535,62 @@ export default function ContactSection() {
           {/* Signature line background */}
           <div className="absolute inset-0 opacity-5">
             <svg className="w-full h-full" viewBox="0 0 800 200" fill="none">
-              <line x1="200" y1="150" x2="600" y2="150" stroke="white" strokeWidth="1" strokeDasharray="10,5" />
-              <text x="400" y="170" textAnchor="middle" fill="white" fontSize="12" opacity="0.5">
+              <line
+                x1="200"
+                y1="150"
+                x2="600"
+                y2="150"
+                stroke="white"
+                strokeWidth="1"
+                strokeDasharray="10,5"
+              />
+              <text
+                x="400"
+                y="170"
+                textAnchor="middle"
+                fill="white"
+                fontSize="12"
+                opacity="0.5"
+              >
                 Rythme Nagrani
               </text>
             </svg>
           </div>
 
           <div className="space-y-4 relative z-10">
-            <h3 className="text-3xl font-bold text-white">Ready to Innovate?</h3>
+            <h3 className="text-3xl font-bold text-white">
+              Ready to Innovate?
+            </h3>
             <p className="text-gray-200 text-balance max-w-2xl mx-auto">
-              Join me in building the decentralized future. From smart contracts to community growth, let's create
-              something extraordinary together.
+              Join me in building the decentralized future. From smart contracts
+              to community growth, let's create something extraordinary
+              together.
             </p>
           </div>
 
           <div className="flex flex-wrap justify-center gap-4 relative z-10">
-            <Button size="lg" className="bg-white text-black hover:bg-gray-200 transition-all duration-300">
-              <Mail className="w-4 h-4 mr-2" />
-              Start a Project
-            </Button>
-            <Button size="lg" variant="outline" className="border-white/50 text-white hover:bg-white/10 bg-transparent">
-              <ExternalLink className="w-4 h-4 mr-2" />
-              View Resume
-            </Button>
+            <Link href={"https://calendly.com/rythme/30min"}>
+              <Button
+                size="lg"
+                className="bg-white text-black hover:bg-gray-200 transition-all duration-300"
+              >
+                <Mail className="w-4 h-4 mr-2" />
+                Start a Project
+              </Button>
+            </Link>
+            <Link href={"https://drive.google.com/file/d/1JG6ojc-yyH7Q2nKBzf1bXeUvhrU39ug2/view?usp=drive_link"}> 
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-white/50 text-white hover:bg-white/10 bg-transparent"
+              >
+                <ExternalLink className="w-4 h-4 mr-2" />
+                View Resume
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
     </section>
-  )
+  );
 }
