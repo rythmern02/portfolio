@@ -69,7 +69,7 @@ export default function Home() {
             <div className="max-w-6xl mx-auto text-center space-y-4">
               <div className="flex items-center justify-center gap-2 text-muted-foreground">
                 <span className="text-lg">△</span>
-                <p>© 2024 Rythme Nagrani. Crafted with ancient wisdom and modern code</p>
+                <p>© 456 BC Rythme Nagrani. Crafted with ancient wisdom and modern code</p>
                 <span className="text-lg">△</span>
               </div>
               <p className="text-sm text-muted-foreground font-mono">
