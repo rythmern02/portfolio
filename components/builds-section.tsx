@@ -8,7 +8,7 @@ export default function BuildsSection() {
     <section id="builds" className="px-5 py-24 md:px-6">
       <div className="mx-auto max-w-content">
         <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
-          <SectionHeading index="02" eyebrow="Latest builds" title="Shipping across chains, every month">
+          <SectionHeading index="II" eyebrow="Latest builds" title="Shipping across chains, every month">
             Smaller builds from 2025 and 2026: account abstraction, agent payments, staking and 3D web.
           </SectionHeading>
           <a href={labs.portfolio} target="_blank" rel="noopener" className="btn-ghost shrink-0 self-start md:self-auto">
@@ -18,7 +18,7 @@ export default function BuildsSection() {
 
         <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {builds.map((b) => (
-            <li key={b.name} className="card group flex flex-col overflow-hidden transition-colors hover:border-white/25">
+            <li key={b.name} data-reveal className="card group flex flex-col overflow-hidden transition-colors hover:border-white/25">
               <div className="relative aspect-[16/9] overflow-hidden bg-black">
                 <Image
                   src={b.image}

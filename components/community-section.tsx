@@ -9,7 +9,7 @@ export default function CommunitySection() {
   return (
     <section id="community" className="px-5 py-24 md:px-6">
       <div className="mx-auto max-w-content">
-        <SectionHeading index="03" eyebrow="Developer relations" title="I bring developers onchain, then help them ship">
+        <SectionHeading index="III" eyebrow="Developer relations" title="I bring developers onchain, then help them ship">
           Bootcamps, hackathons and build stations across India, run through Web3Spell with ecosystem teams from Solana,
           Arbitrum, Ethereum and more.
         </SectionHeading>
@@ -29,7 +29,7 @@ export default function CommunitySection() {
               href={featured.caseStudy}
               target="_blank"
               rel="noopener"
-              className="card group relative overflow-hidden lg:col-span-2 lg:row-span-2"
+              data-reveal className="card group relative overflow-hidden lg:col-span-2 lg:row-span-2"
             >
               {featured.image && (
                 <div className="relative aspect-[16/9] overflow-hidden">
@@ -53,7 +53,7 @@ export default function CommunitySection() {
             </a>
           )}
           {rest.map((e) => (
-            <div key={e.name} className="card p-6">
+            <div key={e.name} data-reveal className="card p-6">
               <h3 className="text-lg font-semibold text-white">{e.name}</h3>
               <p className="mt-1.5 text-[15px] leading-relaxed text-white/70">{e.what}</p>
             </div>
@@ -61,7 +61,7 @@ export default function CommunitySection() {
         </div>
 
         <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          <div className="card p-6 md:col-span-2 lg:col-span-1">
+          <div data-reveal className="card p-6 md:col-span-2 lg:col-span-1">
             <h3 className="flex items-center gap-2 text-base font-semibold text-white">
               <Mic className="h-4 w-4 text-moon" aria-hidden /> SpellCast podcast
             </h3>
@@ -76,7 +76,7 @@ export default function CommunitySection() {
             </div>
           </div>
 
-          <div className="card p-6">
+          <div data-reveal className="card p-6">
             <h3 className="flex items-center gap-2 text-base font-semibold text-white">
               <Trophy className="h-4 w-4 text-moon" aria-hidden /> Recognition
             </h3>
@@ -87,7 +87,7 @@ export default function CommunitySection() {
             </ul>
           </div>
 
-          <div className="card p-6">
+          <div data-reveal className="card p-6">
             <h3 className="flex items-center gap-2 text-base font-semibold text-white">
               <PenLine className="h-4 w-4 text-moon" aria-hidden /> Speaking & writing
             </h3>

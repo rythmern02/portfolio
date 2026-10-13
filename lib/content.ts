@@ -323,3 +323,58 @@ export const education = {
   period: "2022 – 2025",
   certs: "Solana Development (Rust, Anchor), Narra8ive · Blockchain Development, Alchemy University",
 };
+
+// Chapters of the scroll film at the top of the page. `window` is the slice of
+// scroll progress (0 to 1) during which the chapter is on screen.
+export type FilmChapter = {
+  window: [number, number];
+  lead?: string;
+  word: string;
+  body?: string;
+  ctas?: Link[];
+};
+
+export const film: FilmChapter[] = [
+  {
+    window: [0, 0.14],
+    lead: "Protocol engineer · Developer relations",
+    word: "RYTHME NAGRANI",
+    body: "Open to DevRel and protocol engineering roles · Singapore or remote",
+  },
+  {
+    window: [0.18, 0.36],
+    lead: "If you're shipping onchain, I",
+    word: "BUILD",
+    body: "Protocols on Base, Solana, Rootstock and Somnia: Certora-reviewed DeFi, zero-knowledge payroll and execution engines.",
+    ctas: [
+      { label: "See the work", href: "#work" },
+      { label: "Resume", href: "/Rythme-Nagrani-Resume.pdf" },
+    ],
+  },
+  {
+    window: [0.39, 0.55],
+    lead: "If you're growing a developer ecosystem, I",
+    word: "TEACH",
+    body: "75+ developer events and 5,000+ developers reached. Bootcamps, hackathons and docs, and I write the code behind them.",
+    ctas: [
+      { label: "Developer relations", href: "#community" },
+      { label: "Get in touch", href: "#contact" },
+    ],
+  },
+  {
+    window: [0.58, 0.72],
+    lead: "When it counts, I",
+    word: "WIN",
+    body: "TOKEN2049 Origins Hackathon winner. $17K Compound grant. Author on the Rootstock Developer Portal.",
+    ctas: [{ label: "Recognition", href: "#community" }],
+  },
+  {
+    window: [0.8, 1.01],
+    lead: "The circle is open",
+    word: "SEE WHAT I'VE CAST",
+    ctas: [
+      { label: "Enter the grimoire", href: "#work" },
+      { label: "Summon me", href: "#contact" },
+    ],
+  },
+];

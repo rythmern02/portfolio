@@ -11,8 +11,10 @@ export default {
         display: ["var(--font-display)", "Georgia", "serif"],
       },
       colors: {
-        ink: "#06070b",
-        panel: "#0c0e14",
+        ink: "#04050a",
+        panel: "#0a0d16",
+        // The brass of the robe's zipper, used for numerals and ornaments.
+        gold: { DEFAULT: "#d9b56a", soft: "#ecd7a6" },
         // Moonlight blue, taken from the glow on the wizard's robe.
         moon: { DEFAULT: "#8fd3ff", soft: "#c6e8ff", deep: "#2b6cb0" },
       },
@@ -22,6 +24,7 @@ export default {
         "spin-slow": { to: { transform: "rotate(360deg)" } },
         "fade-up": { from: { opacity: "0", transform: "translateY(12px)" }, to: { opacity: "1", transform: "none" } },
         orbit: { to: { transform: "rotate(360deg)" } },
+        draw: { from: { strokeDashoffset: "1" }, to: { strokeDashoffset: "0" } },
       },
       animation: {
         float: "float 3s ease-in-out infinite",

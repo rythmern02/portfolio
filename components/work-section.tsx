@@ -5,7 +5,7 @@ import SectionHeading from "./section-heading";
 
 function CaseStudyCard({ study, flip }: { study: CaseStudy; flip: boolean }) {
   return (
-    <article className="card grid overflow-hidden lg:grid-cols-2">
+    <article data-reveal className="card grid overflow-hidden lg:grid-cols-2">
       <a
         href={study.caseStudy ?? study.live}
         target="_blank"
@@ -81,7 +81,7 @@ export default function WorkSection() {
   return (
     <section id="work" className="px-5 py-24 md:px-6">
       <div className="mx-auto max-w-content">
-        <SectionHeading index="01" eyebrow="Selected work" title="Protocols I designed, built and shipped">
+        <SectionHeading index="I" eyebrow="Selected work" title="Protocols I designed, built and shipped">
           Three products with real money, real audits or real users behind them. The full write-ups live on the{" "}
           <a href={labs.work} target="_blank" rel="noopener" className="text-link">
             Web3Spell Labs
@@ -95,7 +95,7 @@ export default function WorkSection() {
           ))}
         </div>
 
-        <article className="card mt-6 p-6 md:p-8">
+        <article data-reveal className="card mt-6 p-6 md:p-8">
           <div className="grid gap-6 lg:grid-cols-[1fr_1.1fr] lg:gap-10">
             <div>
               <span className="chip !text-moon">Rootstock · 2026</span>

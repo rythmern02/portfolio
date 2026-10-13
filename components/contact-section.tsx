@@ -47,11 +47,18 @@ export default function ContactSection() {
   return (
     <section id="contact" className="px-5 pb-16 pt-24 md:px-6">
       <div className="mx-auto grid max-w-content gap-12 lg:grid-cols-2 lg:gap-16">
-        <div>
+        <div data-reveal>
           <p className="eyebrow">
-            <span className="text-white/40">06 /</span> Contact
+            <span className="text-white/40">Chapter V</span>
+            <span aria-hidden className="mx-2 inline-block h-px w-8 translate-y-[-3px] bg-gold/60" />
+            Summon
           </p>
-          <h2 className="section-title mt-3">Hiring for DevRel or protocol engineering?</h2>
+          <h2 className="section-title mt-4">
+            <span className="sr-only">Hiring for DevRel or protocol engineering?</span>
+            <span aria-hidden data-decipher="Hiring for DevRel or protocol engineering?">
+              Hiring for DevRel or protocol engineering?
+            </span>
+          </h2>
           <p className="mt-4 text-lg leading-relaxed text-white/75">
             I'm looking for a developer relations or protocol engineering role, in Singapore or remote. Collaborations
             and speaking invites are welcome too.
@@ -84,7 +91,7 @@ export default function ContactSection() {
           </ul>
         </div>
 
-        <form onSubmit={onSubmit} className="card space-y-4 p-6 md:p-8" noValidate={false}>
+        <form onSubmit={onSubmit} data-reveal className="card space-y-4 p-6 md:p-8" noValidate={false}>
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="block">
               <span className="mb-1.5 block text-sm text-white/80">First name</span>

@@ -1,14 +1,15 @@
 import type React from "react";
 import type { Metadata, Viewport } from "next";
-import { Lemonada } from "next/font/google";
+import { Cinzel } from "next/font/google";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { profile, siteUrl } from "@/lib/content";
+import "lenis/dist/lenis.css";
 import "./globals.css";
 
-const lemonada = Lemonada({
+const cinzel = Cinzel({
   subsets: ["latin"],
-  weight: ["500", "700"],
+  weight: ["500", "600", "700"],
   variable: "--font-display",
   display: "swap",
 });
@@ -42,13 +43,13 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#06070b",
+  themeColor: "#04050a",
   colorScheme: "dark",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`dark scroll-smooth ${lemonada.variable} ${GeistSans.variable} ${GeistMono.variable}`}>
+    <html lang="en" className={`dark ${cinzel.variable} ${GeistSans.variable} ${GeistMono.variable}`}>
       <body className="font-sans">{children}</body>
     </html>
   );
