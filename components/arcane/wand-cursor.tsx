@@ -19,7 +19,8 @@ export default function WandCursor() {
     const ring = ringRef.current!;
     let W = 0;
     let H = 0;
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    // Sparks are 1–2px dots: 1x is indistinguishable and a quarter of the pixels.
+    const dpr = 1;
     const resize = () => {
       W = window.innerWidth;
       H = window.innerHeight;
@@ -52,27 +53,39 @@ export default function WandCursor() {
       }
       const t = e.target as Element | null;
       hovering = !!t?.closest?.("a, button, input, textarea, [role=button]");
+      wake();
     };
     const onDown = () => {
       for (let i = 0; i < 18; i++) {
         const a = (i / 18) * Math.PI * 2;
         sparks.push({ x: mouse.x, y: mouse.y, vx: Math.cos(a) * 160, vy: Math.sin(a) * 160, life: 1 });
       }
+      wake();
     };
     window.addEventListener("pointermove", onMove, { passive: true });
     window.addEventListener("pointerdown", onDown, { passive: true });
 
     let last = performance.now();
     let frame = 0;
+    let running = false;
+    let dirty = false; // something is on the canvas that needs clearing
+    // The loop only runs while the ring is catching up or sparks are alive.
+    const wake = () => {
+      if (running) return;
+      running = true;
+      last = performance.now();
+      frame = requestAnimationFrame(loop);
+    };
     const loop = (now: number) => {
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
       pos.x += (mouse.x - pos.x) * 0.25;
       pos.y += (mouse.y - pos.y) * 0.25;
-      ring.style.transform = `translate(${pos.x}px, ${pos.y}px) translate(-50%, -50%) scale(${hovering ? 1.8 : 1})`;
+      ring.style.transform = `translate3d(${pos.x.toFixed(1)}px, ${pos.y.toFixed(1)}px, 0) translate(-50%, -50%) scale(${hovering ? 1.8 : 1})`;
 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.clearRect(0, 0, W, H);
+      if (dirty || sparks.length) ctx.clearRect(0, 0, W, H);
+      dirty = sparks.length > 0;
       ctx.globalCompositeOperation = "lighter";
       for (let i = sparks.length - 1; i >= 0; i--) {
         const s = sparks[i];
@@ -91,9 +104,10 @@ export default function WandCursor() {
         ctx.arc(s.x, s.y, 1.6 * s.life + 0.4, 0, Math.PI * 2);
         ctx.fill();
       }
-      frame = requestAnimationFrame(loop);
+      const settling = Math.abs(mouse.x - pos.x) > 0.3 || Math.abs(mouse.y - pos.y) > 0.3;
+      if (settling || sparks.length || dirty) frame = requestAnimationFrame(loop);
+      else running = false;
     };
-    frame = requestAnimationFrame(loop);
 
     return () => {
       cancelAnimationFrame(frame);
@@ -110,7 +124,8 @@ export default function WandCursor() {
       <div
         ref={ringRef}
         aria-hidden
-        className="pointer-events-none fixed left-0 top-0 z-[81] hidden h-7 w-7 rounded-full border border-moon/80 transition-[width,height] [.wand_&]:block"
+        className="pointer-events-none fixed left-0 top-0 z-[81] hidden h-7 w-7 rounded-full border border-moon/80 will-change-transform [.wand_&]:block"
+        style={{ transform: "translate3d(-100px, -100px, 0)" }}
       >
         <span className="absolute left-1/2 top-1/2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow-[0_0_10px_3px_rgba(143,211,255,0.9)]" />
       </div>

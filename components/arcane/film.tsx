@@ -120,8 +120,66 @@ function flameSprite() {
   return c;
 }
 
+function haloSprite() {
+  const s = 256;
+  const c = makeCanvas(s, s);
+  const g = c.getContext("2d")!;
+  const grad = g.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+  grad.addColorStop(0, "rgba(43,108,176,1)");
+  grad.addColorStop(1, "rgba(43,108,176,0)");
+  g.fillStyle = grad;
+  g.fillRect(0, 0, s, s);
+  return c;
+}
+
+function glyphSprite(ch: string, px: number, font: string) {
+  const pad = 4;
+  const probe = makeCanvas(1, 1).getContext("2d")!;
+  probe.font = `${px}px ${font}`;
+  const w = Math.ceil(probe.measureText(ch).width) + pad * 2;
+  const h = Math.ceil(px * 1.4) + pad * 2;
+  const c = makeCanvas(w * 2, h * 2);
+  const g = c.getContext("2d")!;
+  g.scale(2, 2);
+  g.font = `${px}px ${font}`;
+  g.textAlign = "center";
+  g.textBaseline = "middle";
+  g.fillStyle = "#c6e8ff";
+  g.fillText(ch, w / 2, h / 2);
+  return { c, w, h };
+}
+
 type Flame = { x: number; y: number; vx: number; vy: number; life: number; max: number; size: number; seed: number };
-type Glyph = { x: number; y: number; ch: string; size: number; alpha: number; speed: number; depth: number; seed: number };
+type Glyph = {
+  x: number;
+  y: number;
+  sprite: ReturnType<typeof glyphSprite>;
+  alpha: number;
+  speed: number;
+  depth: number;
+  seed: number;
+};
+
+// The big circles are laid out once at this size and only ever moved with
+// GPU transforms, so they never re-render while animating.
+const SIGIL_BASE = 1000;
+
+// Write a style only when its value actually changed.
+const written = new WeakMap<HTMLElement, Record<string, string>>();
+function setStyle(el: HTMLElement, prop: string, value: string) {
+  const cache = written.get(el) ?? {};
+  if (cache[prop] === value) return;
+  cache[prop] = value;
+  written.set(el, cache);
+  (el.style as unknown as Record<string, string>)[prop] = value;
+}
+function setVar(el: HTMLElement, name: string, value: string) {
+  const cache = written.get(el) ?? {};
+  if (cache[name] === value) return;
+  cache[name] = value;
+  written.set(el, cache);
+  el.style.setProperty(name, value);
+}
 
 export default function Film() {
   const trackRef = useRef<HTMLElement>(null);
@@ -140,6 +198,8 @@ export default function Film() {
 
     let W = 0;
     let H = 0;
+    let trackTop = 0;
+    let trackH = 1;
     let dpr = 1;
     let layers: ReturnType<typeof buildLayers> | null = null;
     const img = new window.Image();
@@ -149,26 +209,29 @@ export default function Film() {
     };
     if (img.complete && img.naturalWidth) layers = buildLayers(img);
     const sprite = flameSprite();
+    const halo = haloSprite();
 
     const mono = getComputedStyle(document.documentElement).getPropertyValue("--font-geist-mono").trim() || "monospace";
     const flames: Flame[] = [];
-    const flameCount = mobile ? 70 : 160;
+    const flameCount = mobile ? 60 : 110;
     const glyphs: Glyph[] = [];
 
     const resize = () => {
-      dpr = Math.min(2, window.devicePixelRatio || 1);
+      // The portrait is 500px, so rendering past 1.5x buys no detail, only cost.
+      dpr = Math.min(1.5, window.devicePixelRatio || 1);
       W = canvas.clientWidth;
       H = canvas.clientHeight;
       canvas.width = Math.round(W * dpr);
       canvas.height = Math.round(H * dpr);
+      trackTop = track.offsetTop;
+      trackH = track.offsetHeight;
       glyphs.length = 0;
       const n = mobile ? 14 : 26;
       for (let i = 0; i < n; i++) {
         glyphs.push({
           x: Math.random() * W,
           y: Math.random() * H,
-          ch: GLYPHS[i % GLYPHS.length],
-          size: 11 + Math.random() * 14,
+          sprite: glyphSprite(GLYPHS[i % GLYPHS.length], 11 + Math.random() * 18, mono),
           alpha: 0.08 + Math.random() * 0.2,
           speed: 6 + Math.random() * 16,
           depth: 0.3 + Math.random() * 0.9,
@@ -179,6 +242,7 @@ export default function Film() {
     resize();
     const ro = new ResizeObserver(resize);
     ro.observe(canvas);
+    ro.observe(document.body);
 
     const spawnFlame = (): Flame => ({
       x: Math.random() * W,
@@ -198,10 +262,9 @@ export default function Film() {
     let last = performance.now();
     let time = 0;
 
+    // Cached geometry, so a frame never forces layout.
     const readProgress = () => {
-      const rect = track.getBoundingClientRect();
-      const total = rect.height - window.innerHeight;
-      progress = clamp(-rect.top / Math.max(1, total));
+      progress = clamp((window.scrollY - trackTop) / Math.max(1, trackH - H));
     };
 
     const draw = (dt: number) => {
@@ -228,11 +291,9 @@ export default function Film() {
 
       // ---- halo -----------------------------------------------------------
       const [hx, hy] = toScreen(250, 230);
-      const halo = ctx.createRadialGradient(hx, hy, 0, hx, hy, 300 * s);
-      halo.addColorStop(0, `rgba(43,108,176,${0.25 + 0.25 * wake})`);
-      halo.addColorStop(1, "rgba(6,7,11,0)");
-      ctx.fillStyle = halo;
-      ctx.fillRect(0, 0, W, H);
+      ctx.globalAlpha = 0.25 + 0.25 * wake;
+      ctx.drawImage(halo, hx - 300 * s, hy - 300 * s, 600 * s, 600 * s);
+      ctx.globalAlpha = 1;
 
       // ---- portrait -------------------------------------------------------
       if (layers && fade > 0.001) {
@@ -338,9 +399,6 @@ export default function Film() {
 
       // ---- glyphs ---------------------------------------------------------
       ctx.save();
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillStyle = "#c6e8ff";
       for (const gl of glyphs) {
         if (!reduced) {
           gl.y -= gl.speed * gl.depth * dt;
@@ -353,8 +411,9 @@ export default function Film() {
         const yy = ((y % (H + 60)) + H + 60) % (H + 60) - 30;
         const x = gl.x + Math.sin(t * 0.6 + gl.seed) * 18 * gl.depth;
         ctx.globalAlpha = gl.alpha * (0.6 + 0.4 * Math.sin(t + gl.seed));
-        ctx.font = `${gl.size * (0.7 + gl.depth * 0.5)}px ${mono}`;
-        ctx.fillText(gl.ch, x, yy);
+        const k = 0.7 + gl.depth * 0.5;
+        const { c, w, h } = gl.sprite;
+        ctx.drawImage(c, x - (w * k) / 2, yy - (h * k) / 2, w * k, h * k);
       }
       ctx.restore();
 
@@ -391,24 +450,29 @@ export default function Film() {
       const bg = bgSigilRef.current;
       if (bg) {
         const [sx, sy] = toScreen(250, 170);
-        const size = 560 * s;
-        bg.style.transform = `translate(${sx - size / 2}px, ${sy - size / 2}px)`;
-        bg.style.width = bg.style.height = `${size}px`;
-        bg.style.opacity = String(0.1 + 0.22 * ignite * fade);
-        bg.style.setProperty("--r1", `${p * 140 + t * 4}deg`);
-        bg.style.setProperty("--r2", `${-p * 220 - t * 6}deg`);
-        bg.style.setProperty("--r3", `${p * 90}deg`);
+        const k = (560 * s) / SIGIL_BASE;
+        const o = 0.1 + 0.22 * ignite * fade;
+        setStyle(bg, "opacity", o < 0.005 ? "0" : o.toFixed(3));
+        setStyle(bg, "visibility", o < 0.005 || k > 4 ? "hidden" : "visible");
+        if (o >= 0.005 && k <= 4) {
+          setStyle(bg, "transform", `translate3d(${(sx - SIGIL_BASE / 2).toFixed(1)}px, ${(sy - SIGIL_BASE / 2).toFixed(1)}px, 0) scale(${k.toFixed(4)})`);
+          setVar(bg, "--r1", `${(p * 140 + t * 4).toFixed(2)}deg`);
+          setVar(bg, "--r2", `${(-p * 220 - t * 6).toFixed(2)}deg`);
+          setVar(bg, "--r3", `${(p * 90).toFixed(2)}deg`);
+        }
       }
       const portal = portalRef.current;
       if (portal) {
         const open = range(p, 0.72, 0.86);
         const size = Math.min(W, H) * (mobile ? 1.05 : 0.92);
-        portal.style.opacity = String(open);
-        portal.style.transform = `translate(-50%, -50%) scale(${0.08 + 0.92 * open})`;
-        portal.style.width = portal.style.height = `${size}px`;
-        portal.style.setProperty("--r1", `${t * 8 + p * 200}deg`);
-        portal.style.setProperty("--r2", `${-t * 12 - p * 300}deg`);
-        portal.style.setProperty("--r3", `${t * 5}deg`);
+        setStyle(portal, "opacity", open.toFixed(3));
+        setStyle(portal, "visibility", open < 0.005 ? "hidden" : "visible");
+        if (open >= 0.005) {
+          setStyle(portal, "transform", `translate(-50%, -50%) scale(${((size / SIGIL_BASE) * (0.08 + 0.92 * open)).toFixed(4)})`);
+          setVar(portal, "--r1", `${(t * 8 + p * 200).toFixed(2)}deg`);
+          setVar(portal, "--r2", `${(-t * 12 - p * 300).toFixed(2)}deg`);
+          setVar(portal, "--r3", `${(t * 5).toFixed(2)}deg`);
+        }
       }
 
       let current = Math.max(0, lastChapter);
@@ -418,10 +482,12 @@ export default function Film() {
         const [a, b] = ch.window;
         const v = range(p, a - 0.03, a + 0.01) * (1 - range(p, b - 0.01, b + 0.03));
         const shown = i === 0 ? 1 - range(p, b - 0.01, b + 0.03) : v;
-        el.style.opacity = String(shown);
-        el.style.transform = `translateY(${(1 - shown) * 28}px)`;
-        el.style.pointerEvents = shown > 0.5 ? "auto" : "none";
-        el.setAttribute("aria-hidden", shown > 0.5 ? "false" : "true");
+        setStyle(el, "opacity", shown.toFixed(3));
+        setStyle(el, "visibility", shown < 0.005 ? "hidden" : "visible");
+        setStyle(el, "transform", `translate3d(0, ${((1 - shown) * 28).toFixed(1)}px, 0)`);
+        setStyle(el, "pointerEvents", shown > 0.5 ? "auto" : "none");
+        const hidden = shown > 0.5 ? "false" : "true";
+        if (el.getAttribute("aria-hidden") !== hidden) el.setAttribute("aria-hidden", hidden);
         if (shown > 0.5) current = i;
       });
       if (current !== lastChapter) {
@@ -430,7 +496,7 @@ export default function Film() {
         if (lastChapter !== -1) window.dispatchEvent(new CustomEvent("arcane:chapter", { detail: current }));
         lastChapter = current;
       }
-      if (hintRef.current) hintRef.current.style.opacity = String(1 - range(p, 0.02, 0.08));
+      if (hintRef.current) setStyle(hintRef.current, "opacity", (1 - range(p, 0.02, 0.08)).toFixed(3));
     };
 
     const loop = (now: number) => {
@@ -481,8 +547,13 @@ export default function Film() {
   return (
     <section id="top" ref={trackRef} aria-label="Introduction" className="relative z-10 h-[620vh] md:h-[700vh]">
       <div className="sticky top-0 h-[100svh] overflow-hidden">
-        <div ref={bgSigilRef} className="pointer-events-none absolute left-0 top-0 text-moon will-change-transform" aria-hidden>
-          <Sigil id="bg-sigil" className="h-full w-full" />
+        <div
+          ref={bgSigilRef}
+          className="pointer-events-none absolute left-0 top-0 origin-center text-moon will-change-transform"
+          style={{ width: SIGIL_BASE, height: SIGIL_BASE }}
+          aria-hidden
+        >
+          <Sigil id="bg-sigil" layered className="h-full w-full" />
         </div>
 
         <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" aria-hidden />
@@ -490,9 +561,12 @@ export default function Film() {
         <div
           ref={portalRef}
           aria-hidden
-          className="pointer-events-none absolute left-1/2 top-[42%] text-moon opacity-0 drop-shadow-[0_0_24px_rgba(143,211,255,0.55)] md:top-[44%]"
+          className="pointer-events-none invisible absolute left-1/2 top-[42%] origin-center text-moon opacity-0 will-change-transform md:top-[44%]"
+          style={{ width: SIGIL_BASE, height: SIGIL_BASE }}
         >
-          <Sigil id="portal-sigil" className="h-full w-full" />
+          {/* A painted glow instead of a drop-shadow filter: no per-frame filter work. */}
+          <div className="absolute inset-[-6%] rounded-full bg-[radial-gradient(circle,rgba(143,211,255,0.22)_0%,rgba(143,211,255,0.08)_45%,transparent_70%)]" />
+          <Sigil id="portal-sigil" layered className="h-full w-full" />
         </div>
 
         {/* Vignette and bottom fade keep the copy readable over the art. */}
@@ -509,7 +583,7 @@ export default function Film() {
             ref={(el) => {
               chapterRefs.current[i] = el;
             }}
-            className="absolute inset-x-0 bottom-[13%] px-5 text-center md:bottom-[12%]"
+            className="absolute inset-x-0 bottom-[13%] px-5 text-center will-change-[transform,opacity] md:bottom-[12%]"
             style={{ opacity: i === 0 ? 1 : 0 }}
             aria-hidden={i === 0 ? "false" : "true"}
           >

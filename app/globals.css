@@ -58,7 +58,7 @@
 
   /* Cards get brass corner brackets, like plates in an old book. */
   .card {
-    @apply relative rounded-2xl border border-white/10 bg-panel/80 backdrop-blur-sm transition-colors;
+    @apply relative rounded-2xl border border-white/10 bg-panel/95 transition-colors;
   }
   .card::before,
   .card::after {
@@ -124,8 +124,7 @@
     color: #eaf6ff;
     background:
       radial-gradient(120% 160% at 50% 130%, rgba(43, 108, 176, 0.45), transparent 60%),
-      rgba(8, 11, 20, 0.78);
-    backdrop-filter: blur(8px);
+      rgba(8, 11, 20, 0.9);
     transition:
       transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1),
       box-shadow 0.4s ease,
@@ -259,17 +258,14 @@
 /* Scroll reveal. Hidden state only applies once JavaScript is running. */
 html.js main [data-reveal] {
   opacity: 0;
-  transform: translateY(28px);
-  filter: blur(6px);
+  transform: translate3d(0, 28px, 0);
   transition:
     opacity 0.9s cubic-bezier(0.2, 0.7, 0.2, 1),
-    transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1),
-    filter 0.9s ease;
+    transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 html.js main [data-reveal].is-in {
   opacity: 1;
   transform: none;
-  filter: none;
 }
 
 @property --spell-angle {
@@ -301,7 +297,6 @@ html.js main [data-reveal].is-in {
   html.js main [data-reveal] {
     opacity: 1;
     transform: none;
-    filter: none;
   }
 }
 

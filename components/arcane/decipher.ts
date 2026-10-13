@@ -10,6 +10,12 @@ export function decipher(el: HTMLElement, duration = 900) {
   const prev = running.get(el);
   if (prev) cancelAnimationFrame(prev);
   const start = performance.now();
+  // Runes are wider or narrower than letters; hold the box still so the
+  // scramble never reflows the rest of the page.
+  const holder = getComputedStyle(el).display === "inline" ? (el.parentElement ?? el) : el;
+  const box = holder.getBoundingClientRect();
+  holder.style.minHeight = `${box.height}px`;
+  holder.style.minWidth = `${box.width}px`;
 
   const step = (now: number) => {
     const t = Math.min(1, (now - start) / duration);
@@ -24,6 +30,8 @@ export function decipher(el: HTMLElement, duration = 900) {
     if (t < 1) running.set(el, requestAnimationFrame(step));
     else {
       el.textContent = text;
+      holder.style.minHeight = "";
+      holder.style.minWidth = "";
       running.delete(el);
     }
   };

@@ -26,7 +26,7 @@ export default function Home() {
   // Smooth, weighted scrolling: it is what makes the film feel like a camera.
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
-    const lenis = new Lenis({ autoRaf: true, anchors: { offset: -72 }, lerp: 0.09 })
+    const lenis = new Lenis({ autoRaf: true, anchors: { offset: -72 }, lerp: 0.12 })
     return () => lenis.destroy()
   }, [])
 
@@ -49,9 +49,11 @@ export default function Home() {
 
       <Film />
 
-      {/* A faint circle keeps turning behind the grimoire chapters. */}
+      {/* A faint, still circle behind the grimoire chapters. */}
       <div aria-hidden className="pointer-events-none fixed inset-0 z-0 flex items-center justify-center">
-        <Sigil id="ambient-sigil" className="h-[110vmin] w-[110vmin] animate-[spin-slow_120s_linear_infinite] text-moon/[0.035]" />
+        <div className="h-[110vmin] w-[110vmin] rotate-[18deg] text-moon/[0.035]">
+          <Sigil id="ambient-sigil" className="h-full w-full" />
+        </div>
       </div>
 
       <div className="relative z-10">

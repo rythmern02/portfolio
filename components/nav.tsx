@@ -89,8 +89,8 @@ export default function Nav() {
           </a>
 
           <div
-            className={`relative hidden items-center rounded-full border px-2 py-1.5 backdrop-blur-xl transition-colors duration-500 lg:flex ${
-              scrolled ? "border-white/10 bg-ink/60" : "border-white/[0.06] bg-white/[0.02]"
+            className={`relative hidden items-center rounded-full border px-2 py-1.5 transition-colors duration-500 lg:flex ${
+              scrolled ? "border-white/10 bg-ink/90" : "border-white/[0.07] bg-ink/55"
             }`}
           >
             <ul className="relative flex items-center">
@@ -142,7 +142,7 @@ export default function Nav() {
       {/* Full-screen menu for smaller screens */}
       <div
         id="grimoire-menu"
-        className={`fixed inset-0 z-40 flex flex-col justify-center bg-ink/95 px-8 backdrop-blur-xl transition-all duration-500 lg:hidden ${
+        className={`fixed inset-0 z-40 flex flex-col justify-center bg-ink/95 px-8 transition-all duration-500 lg:hidden ${
           open ? "visible opacity-100" : "invisible opacity-0"
         }`}
         inert={!open}
