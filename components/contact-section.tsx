@@ -1,595 +1,128 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import {
-  Mail,
-  Phone,
-  MapPin,
-  Github,
-  Twitter,
-  ExternalLink,
-  Send,
-  Calendar,
-} from "lucide-react";
 import { useState } from "react";
-import Link from "next/link";
+import { ArrowUpRight, Check, Copy, Loader2 } from "lucide-react";
+import { profile } from "@/lib/content";
+
+const field =
+  "w-full rounded-xl border border-white/15 bg-black/40 px-4 py-3 text-[15px] text-white placeholder:text-white/40 transition-colors focus:border-moon focus:outline-none";
+
+type Status = { kind: "idle" | "sending" | "sent" | "error"; message?: string };
 
 export default function ContactSection() {
-  const [formValues, setFormValues] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    subject: "",
-    message: "",
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [serverMessage, setServerMessage] = useState<{
-    type: "success" | "error";
-    text: string;
-  } | null>(null);
+  const [status, setStatus] = useState<Status>({ kind: "idle" });
+  const [copied, setCopied] = useState(false);
 
-  function handleInputChange(
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) {
-    const { name, value } = e.target;
-    setFormValues((prev) => ({ ...prev, [name]: value }));
+  async function copyEmail() {
+    try {
+      await navigator.clipboard.writeText(profile.email);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      window.location.href = `mailto:${profile.email}`;
+    }
   }
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setServerMessage(null);
-    if (!formValues.firstName || !formValues.email || !formValues.message) {
-      setServerMessage({ type: "error", text: "Please fill required fields." });
-      return;
-    }
-    setIsSubmitting(true);
+    const form = e.currentTarget;
+    const data = Object.fromEntries(new FormData(form));
+    setStatus({ kind: "sending" });
     try {
+      // Same payload the /api/contact route has always accepted.
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formValues),
+        body: JSON.stringify(data),
       });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data?.error || "Failed to send message.");
-      }
-      setServerMessage({
-        type: "success",
-        text: "Thanks! Your message has been sent.",
-      });
-      setFormValues({
-        firstName: "",
-        lastName: "",
-        email: "",
-        subject: "",
-        message: "",
-      });
-    } catch (err: any) {
-      setServerMessage({
-        type: "error",
-        text: err?.message || "Something went wrong.",
-      });
-    } finally {
-      setIsSubmitting(false);
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body?.error || "Something went wrong");
+      form.reset();
+      setStatus({ kind: "sent", message: "Thanks, your message is on its way. I usually reply within a day." });
+    } catch {
+      setStatus({ kind: "error", message: `Couldn't send that. Email me directly at ${profile.email}.` });
     }
   }
+
   return (
-    <section className="py-24 px-6 relative overflow-hidden">
-      {/* Envelope Paper Background */}
-      <div className="absolute inset-0 opacity-5">
-        <svg
-          className="absolute top-0 left-0 w-full h-full"
-          viewBox="0 0 1200 800"
-          fill="none"
-        >
-          <path
-            d="M100,200 L600,100 L1100,200 L1100,600 L100,600 Z"
-            fill="white"
-            stroke="white"
-            strokeWidth="2"
-            className="animate-pulse"
-          />
-          {/* Envelope fold lines */}
-          <line
-            x1="100"
-            y1="200"
-            x2="600"
-            y2="400"
-            stroke="white"
-            strokeWidth="1"
-            opacity="0.5"
-          />
-          <line
-            x1="1100"
-            y1="200"
-            x2="600"
-            y2="400"
-            stroke="white"
-            strokeWidth="1"
-            opacity="0.5"
-          />
-        </svg>
-      </div>
-
-      {/* Floating Message Bubbles */}
-      <div className="absolute top-20 left-20 opacity-10">
-        <div className="relative">
-          <div className="w-16 h-12 bg-white rounded-2xl animate-pulse"></div>
-          <div className="absolute -bottom-1 left-4 w-3 h-3 bg-white transform rotate-45"></div>
-        </div>
-      </div>
-
-      {/* Network Connection Lines */}
-      <div className="absolute bottom-20 right-20 opacity-5">
-        <svg width="200" height="200" viewBox="0 0 200 200" fill="none">
-          <circle
-            cx="50"
-            cy="50"
-            r="4"
-            fill="white"
-            className="animate-pulse"
-          />
-          <circle
-            cx="150"
-            cy="50"
-            r="4"
-            fill="white"
-            className="animate-pulse"
-            style={{ animationDelay: "0.5s" }}
-          />
-          <circle
-            cx="100"
-            cy="150"
-            r="4"
-            fill="white"
-            className="animate-pulse"
-            style={{ animationDelay: "1s" }}
-          />
-          <line
-            x1="50"
-            y1="50"
-            x2="150"
-            y2="50"
-            stroke="white"
-            strokeWidth="1"
-            className="animate-pulse"
-          />
-          <line
-            x1="50"
-            y1="50"
-            x2="100"
-            y2="150"
-            stroke="white"
-            strokeWidth="1"
-            className="animate-pulse"
-          />
-          <line
-            x1="150"
-            y1="50"
-            x2="100"
-            y2="150"
-            stroke="white"
-            strokeWidth="1"
-            className="animate-pulse"
-          />
-        </svg>
-      </div>
-
-      <div className="max-w-6xl mx-auto space-y-16 relative z-10">
-        {/* Section Header with Letter Paper */}
-        <div className="text-center space-y-4 relative">
-          {/* Letter paper background */}
-          <div className="absolute inset-0 -z-10 opacity-10">
-            <svg className="w-full h-full" viewBox="0 0 400 200" fill="none">
-              <rect
-                x="50"
-                y="40"
-                width="300"
-                height="120"
-                fill="white"
-                stroke="white"
-                strokeWidth="1"
-                rx="5"
-              />
-              {/* Letter fold marks */}
-              <line
-                x1="50"
-                y1="80"
-                x2="350"
-                y2="80"
-                stroke="white"
-                strokeWidth="0.5"
-                strokeDasharray="5,5"
-              />
-              <line
-                x1="50"
-                y1="120"
-                x2="350"
-                y2="120"
-                stroke="white"
-                strokeWidth="0.5"
-                strokeDasharray="5,5"
-              />
-            </svg>
-          </div>
-          <h2 className="text-4xl lg:text-5xl font-bold text-white relative">
-            Let's Build Together
-            {/* Handwriting underline effect */}
-            <svg
-              className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-48 h-4"
-              viewBox="0 0 200 20"
-              fill="none"
-            >
-              <path
-                d="M10,15 Q50,10 100,15 T190,12"
-                stroke="white"
-                strokeWidth="2"
-                fill="none"
-                opacity="0.3"
-                className="animate-pulse"
-              />
-            </svg>
-          </h2>
-          <p className="text-xl text-gray-300 text-balance">
-            Ready to create the next generation of blockchain applications?
-            Let's connect!
+    <section id="contact" className="px-5 pb-16 pt-24 md:px-6">
+      <div className="mx-auto grid max-w-content gap-12 lg:grid-cols-2 lg:gap-16">
+        <div>
+          <p className="eyebrow">
+            <span className="text-white/40">06 /</span> Contact
           </p>
+          <h2 className="section-title mt-3">Hiring for DevRel or protocol engineering?</h2>
+          <p className="mt-4 text-lg leading-relaxed text-white/75">
+            I'm looking for a developer relations or protocol engineering role, in Singapore or remote. Collaborations
+            and speaking invites are welcome too.
+          </p>
+
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <a href={`mailto:${profile.email}`} className="btn-primary">
+              {profile.email}
+            </a>
+            <button type="button" onClick={copyEmail} className="btn-ghost" aria-live="polite">
+              {copied ? <Check className="h-4 w-4 text-emerald-400" aria-hidden /> : <Copy className="h-4 w-4" aria-hidden />}
+              {copied ? "Copied" : "Copy email"}
+            </button>
+          </div>
+
+          <ul className="mt-10 grid grid-cols-2 gap-3 sm:max-w-sm">
+            {profile.socials.map((s) => (
+              <li key={s.label}>
+                <a
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener"
+                  className="group flex items-center justify-between rounded-xl border border-white/10 px-4 py-3 text-sm text-white/80 transition-colors hover:border-white/30 hover:text-white"
+                >
+                  {s.label}
+                  <ArrowUpRight className="h-4 w-4 text-white/40 group-hover:text-moon" aria-hidden />
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12">
-          {/* Contact Info with Notebook Style */}
-          <div className="space-y-8 relative">
-            {/* Notebook paper background */}
-            <div className="absolute inset-0 opacity-5">
-              <svg className="w-full h-full" viewBox="0 0 400 600" fill="none">
-                <rect
-                  x="20"
-                  y="20"
-                  width="360"
-                  height="560"
-                  fill="white"
-                  stroke="white"
-                  strokeWidth="2"
-                />
-                {/* Notebook holes */}
-                <circle cx="50" cy="80" r="3" fill="black" />
-                <circle cx="50" cy="140" r="3" fill="black" />
-                <circle cx="50" cy="200" r="3" fill="black" />
-                <circle cx="50" cy="260" r="3" fill="black" />
-                {/* Ruled lines */}
-                {Array.from({ length: 20 }, (_, i) => (
-                  <line
-                    key={i}
-                    x1="80"
-                    y1={60 + i * 25}
-                    x2="360"
-                    y2={60 + i * 25}
-                    stroke="white"
-                    strokeWidth="0.5"
-                    opacity="0.3"
-                  />
-                ))}
-              </svg>
-            </div>
-
-            <div className="space-y-6 relative z-10">
-              <h3 className="text-2xl font-bold text-white">Get In Touch</h3>
-              <p className="text-gray-200 leading-relaxed">
-                I'm always excited to discuss new opportunities, collaborate on
-                innovative projects, or share insights about the blockchain
-                ecosystem. Whether you're looking for a developer, mentor, or
-                community builder, let's start a conversation.
-              </p>
-            </div>
-
-            {/* Contact Methods with Ink Spots */}
-            <div className="space-y-4 relative z-10">
-              {[
-                {
-                  icon: Mail,
-                  label: "Email",
-                  value: "rythmenagrani@gmail.com",
-                  href: "mailto:rythmenagrani@gmail.com",
-                },
-                {
-                  icon: Phone,
-                  label: "Phone",
-                  value: "+91 7000 938 600",
-                  href: "tel:+917000938600",
-                },
-                {
-                  icon: MapPin,
-                  label: "Location",
-                  value: "Bhopal, India",
-                  href: "#",
-                },
-                {
-                  icon: Twitter,
-                  label: "Twitter",
-                  value: "@RythmeNagr64107",
-                  href: "https://twitter.com/RythmeNagr64107",
-                },
-                {
-                  icon: Github,
-                  label: "GitHub",
-                  value: "github.com/rythmern02",
-                  href: "https://github.com/rythmern02",
-                },
-              ].map((contact, index) => {
-                const IconComponent = contact.icon;
-                return (
-                  <div
-                    key={index}
-                    className="flex items-center gap-4 group relative"
-                  >
-                    {/* Ink spot behind each contact item */}
-                    <div
-                      className="absolute -left-2 top-1/2 transform -translate-y-1/2 w-1 h-1 bg-white/20 rounded-full animate-pulse"
-                      style={{ animationDelay: `${index * 0.2}s` }}
-                    ></div>
-
-                    <div className="p-3 rounded-lg bg-white/10 border border-white/20 group-hover:bg-white/20 transition-colors">
-                      <IconComponent className="w-5 h-5 text-white" />
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium text-gray-200">
-                        {contact.label}
-                      </p>
-                      <a
-                        href={contact.href}
-                        className="text-white hover:text-gray-300 transition-colors font-medium"
-                      >
-                        {contact.value}
-                      </a>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Availability Card with Stamp Effect */}
-            <Card className="border-white/20 bg-white/5 relative overflow-hidden">
-              {/* Stamp effect */}
-              <div className="absolute top-2 right-2 w-16 h-12 border-2 border-white/30 rounded opacity-30">
-                <div className="text-xs text-white/50 text-center mt-2 font-mono">
-                  OPEN
-                </div>
-              </div>
-
-              <CardContent className="p-6 space-y-4 relative z-10">
-                <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
-                  <h4 className="font-semibold text-white">
-                    Available for New Opportunities
-                  </h4>
-                </div>
-                <p className="text-sm text-gray-200 leading-relaxed">
-                  Currently open to full-time positions, consulting projects,
-                  and collaboration opportunities in blockchain development,
-                  DevRel, and community building roles.
-                </p>
-                <div className="flex flex-wrap gap-2 pt-2">
-                  <Badge
-                    variant="secondary"
-                    className="bg-white/10 text-white border-white/20"
-                  >
-                    Full-time
-                  </Badge>
-                  <Badge
-                    variant="secondary"
-                    className="bg-white/10 text-white border-white/20"
-                  >
-                    Consulting
-                  </Badge>
-                  <Badge
-                    variant="secondary"
-                    className="bg-white/10 text-white border-white/20"
-                  >
-                    Remote
-                  </Badge>
-                  <Badge
-                    variant="secondary"
-                    className="bg-white/10 text-white border-white/20"
-                  >
-                    Hybrid
-                  </Badge>
-                </div>
-              </CardContent>
-            </Card>
+        <form onSubmit={onSubmit} className="card space-y-4 p-6 md:p-8" noValidate={false}>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="block">
+              <span className="mb-1.5 block text-sm text-white/80">First name</span>
+              <input name="firstName" required autoComplete="given-name" className={field} />
+            </label>
+            <label className="block">
+              <span className="mb-1.5 block text-sm text-white/80">
+                Last name <span className="text-white/45">(optional)</span>
+              </span>
+              <input name="lastName" autoComplete="family-name" className={field} />
+            </label>
           </div>
+          <label className="block">
+            <span className="mb-1.5 block text-sm text-white/80">Email</span>
+            <input name="email" type="email" required autoComplete="email" className={field} />
+          </label>
+          <label className="block">
+            <span className="mb-1.5 block text-sm text-white/80">
+              Subject <span className="text-white/45">(optional)</span>
+            </span>
+            <input name="subject" className={field} placeholder="Role, collaboration, event…" />
+          </label>
+          <label className="block">
+            <span className="mb-1.5 block text-sm text-white/80">Message</span>
+            <textarea name="message" required rows={5} className={`${field} resize-y`} />
+          </label>
 
-          {/* Contact Form with Parchment Style */}
-          <Card className="group bg-black border-white/20 hover:border-white/40 transition-all duration-300 hover:shadow-lg hover:shadow-white/20 relative overflow-hidden">
-            {/* Parchment corner effect */}
-            <div className="absolute top-0 left-0 w-8 h-8 opacity-20">
-              <svg className="w-full h-full" viewBox="0 0 32 32" fill="none">
-                <path d="M0,0 L20,0 Q15,5 20,10 L0,10 Z" fill="white" />
-              </svg>
-            </div>
-
-            <CardHeader className="relative z-10">
-              <CardTitle className="text-2xl text-white group-hover:text-white/90 transition-all">
-                Send a Message
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6 relative z-10">
-              <form className="space-y-4" onSubmit={handleSubmit} noValidate>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-white">
-                      First Name
-                    </label>
-                    <Input
-                      name="firstName"
-                      placeholder="John"
-                      className="bg-white/5 border-white/20 focus:border-white/40 text-white placeholder:text-gray-500"
-                      value={formValues.firstName}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-white">
-                      Last Name
-                    </label>
-                    <Input
-                      name="lastName"
-                      placeholder="Doe"
-                      className="bg-white/5 border-white/20 focus:border-white/40 text-white placeholder:text-gray-500"
-                      value={formValues.lastName}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-white">
-                    Email
-                  </label>
-                  <Input
-                    name="email"
-                    type="email"
-                    placeholder="john@example.com"
-                    className="bg-white/5 border-white/20 focus:border-white/40 text-white placeholder:text-gray-500"
-                    value={formValues.email}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-white">
-                    Subject
-                  </label>
-                  <Input
-                    name="subject"
-                    placeholder="Let's discuss a blockchain project"
-                    className="bg-white/5 border-white/20 focus:border-white/40 text-white placeholder:text-gray-500"
-                    value={formValues.subject}
-                    onChange={handleInputChange}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-white">
-                    Message
-                  </label>
-                  <Textarea
-                    name="message"
-                    placeholder="Tell me about your project, opportunity, or how we can collaborate..."
-                    className="min-h-32 bg-white/5 border-white/20 focus:border-white/40 resize-none text-white placeholder:text-gray-500"
-                    value={formValues.message}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-3">
-                  <Button
-                    className="w-full bg-white text-black hover:bg-gray-200 transition-all duration-300"
-                    type="submit"
-                    disabled={isSubmitting}
-                  >
-                    <Send className="w-4 h-4 mr-2" />
-                    {isSubmitting ? "Sending..." : "Send Message"}
-                  </Button>
-                  {serverMessage && (
-                    <p
-                      className={
-                        serverMessage.type === "success"
-                          ? "text-sm text-emerald-300"
-                          : "text-sm text-red-300"
-                      }
-                      aria-live="polite"
-                    >
-                      {serverMessage.text}
-                    </p>
-                  )}
-                </div>
-              </form>
-
-              <div className="text-center pt-4">
-                <p className="text-sm text-gray-200">
-                  Prefer a quick call?
-                  <Link href={"https://calendly.com/rythme/30min"}>
-                    <Button
-                      variant="link"
-                      className="text-white hover:text-gray-300 p-0 ml-1 h-auto"
-                    >
-                      <Calendar className="w-3 h-3 mr-1" />
-                      Schedule a meeting
-                    </Button>
-                  </Link>
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Call to Action with Signature Style */}
-        <div className="text-center space-y-6 pt-16 relative">
-          {/* Signature line background */}
-          <div className="absolute inset-0 opacity-5">
-            <svg className="w-full h-full" viewBox="0 0 800 200" fill="none">
-              <line
-                x1="200"
-                y1="150"
-                x2="600"
-                y2="150"
-                stroke="white"
-                strokeWidth="1"
-                strokeDasharray="10,5"
-              />
-              <text
-                x="400"
-                y="170"
-                textAnchor="middle"
-                fill="white"
-                fontSize="12"
-                opacity="0.5"
-              >
-                Rythme Nagrani
-              </text>
-            </svg>
-          </div>
-
-          <div className="space-y-4 relative z-10">
-            <h3 className="text-3xl font-bold text-white">
-              Ready to Innovate?
-            </h3>
-            <p className="text-gray-200 text-balance max-w-2xl mx-auto">
-              Join me in building the decentralized future. From smart contracts
-              to community growth, let's create something extraordinary
-              together.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap justify-center gap-4 relative z-10">
-            <Link href={"https://calendly.com/rythme/30min"}>
-              <Button
-                size="lg"
-                className="bg-white text-black hover:bg-gray-200 transition-all duration-300"
-              >
-                <Mail className="w-4 h-4 mr-2" />
-                Start a Project
-              </Button>
-            </Link>
-            <Link href={"https://drive.google.com/file/d/1JG6ojc-yyH7Q2nKBzf1bXeUvhrU39ug2/view?usp=drive_link"}> 
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-white/50 text-white hover:bg-white/10 bg-transparent"
-              >
-                <ExternalLink className="w-4 h-4 mr-2" />
-                View Resume
-              </Button>
-            </Link>
-          </div>
-        </div>
+          <button type="submit" disabled={status.kind === "sending"} className="btn-primary w-full justify-center disabled:opacity-60">
+            {status.kind === "sending" && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
+            {status.kind === "sending" ? "Sending…" : "Send message"}
+          </button>
+          <p
+            role="status"
+            className={`min-h-[1.25rem] text-sm ${status.kind === "error" ? "text-rose-300" : "text-emerald-300"}`}
+          >
+            {status.message}
+          </p>
+        </form>
       </div>
     </section>
   );

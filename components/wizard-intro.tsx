@@ -11,8 +11,9 @@ export default function WizardIntro({ onAnimationComplete }: WizardIntroProps) {
   const [stage, setStage] = useState<"center" | "moving" | "complete">("center")
   useEffect(() => {
     const isMdUp = typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
 
-    if (!isMdUp) {
+    if (!isMdUp || reducedMotion) {
       setStage("complete")
       onAnimationComplete()
       return
@@ -94,16 +95,15 @@ export default function WizardIntro({ onAnimationComplete }: WizardIntroProps) {
                 stage === "center" ? "w-80 h-80 rounded-full" : "w-[50vw] h-[calc(100vh)] rounded-lg"
               } overflow-hidden  transition-none  duration-0 md:transition-all md:duration-2000 shadow-2xl`}
             >
+              <WizardGlow />
               <Image
                 src="/wizard-portrait.png"
                 alt="Rythme Nagrani - Blockchain Wizard"
                 fill
-                className="object-cover object-center"
+                sizes="(min-width: 768px) 50vw, 320px"
+                className="object-contain object-bottom"
                 priority
               />
-
-              {/* Overlay effects */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
             </div>
 
             {/* Floating code elements around the image */}
@@ -122,17 +122,19 @@ export default function WizardIntro({ onAnimationComplete }: WizardIntroProps) {
 
 export function PermanentWizardPortrait() {
   return (
-    <div className="absolute top-0 right-0 h-screen w-96 z-30 pointer-events-none bg-black/30 hidden md:block">
+    <div className="absolute top-0 right-0 h-screen w-96 z-30 pointer-events-none hidden md:block">
       <div className="h-full flex items-center justify-end">
         <div className="relative">
           
 
           <div className="relative w-[50vw] h-[calc(100vh)] rounded-lg overflow-hidden  ">
+            <WizardGlow />
             <Image
               src="/wizard-portrait.png"
               alt="Rythme Nagrani - Blockchain Wizard"
               fill
-              className="object-cover object-center"
+              sizes="50vw"
+              className="object-contain object-bottom"
               priority
             />
 
@@ -144,5 +146,15 @@ export function PermanentWizardPortrait() {
         </div>
       </div>
     </div>
+  )
+}
+
+// Moonlight halo behind the transparent portrait.
+function WizardGlow() {
+  return (
+    <div
+      aria-hidden
+      className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_65%,rgba(43,108,176,0.45),rgba(6,7,11,0)_65%)]"
+    />
   )
 }

@@ -5,8 +5,6 @@ const resendApiKey = process.env.RESEND_API_KEY;
 const resendFrom = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
 const resendTo = process.env.RESEND_TO_EMAIL || "rythmenagrani@gmail.com";
 
-const resend = new Resend(resendApiKey);
-
 export async function GET() {
   try {
     return NextResponse.json({
@@ -67,6 +65,8 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+
+    const resend = new Resend(resendApiKey);
 
     const textLines = [
       `Name: ${firstName}${lastName ? ` ${lastName}` : ""}`,

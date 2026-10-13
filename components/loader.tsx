@@ -1,127 +1,116 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
+import { useEffect, useRef, useState } from "react";
+
+const MIN_MS = 900; // long enough to read the name, short enough not to annoy
+const MAX_MS = 2600; // never hold the page hostage on a slow network
+
+// Resolves once the wizard image is decoded and the fonts are ready, so the
+// intro that follows never shows a blank frame.
+function waitForAssets() {
+  const img = new window.Image();
+  img.src = "/wizard-portrait.png";
+  const image = img.decode().catch(() => undefined);
+  const fonts = document.fonts?.ready.catch(() => undefined) ?? Promise.resolve();
+  return Promise.all([image, fonts]);
+}
 
 export default function Loader({ onComplete }: { onComplete: () => void }) {
-  const [progress, setProgress] = useState(0)
+  const [progress, setProgress] = useState(0);
+  const [leaving, setLeaving] = useState(false);
+  const done = useRef(false);
+  const skipRef = useRef<() => void>(() => {});
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(timer)
-          setTimeout(onComplete, 500)
-          return 100
-        }
-        return prev + 2
-      })
-    }, 40)
+    const finish = () => {
+      if (done.current) return;
+      done.current = true;
+      setProgress(100);
+      setLeaving(true);
+      setTimeout(onComplete, 350);
+    };
+    skipRef.current = finish;
 
-    return () => clearInterval(timer)
-  }, [onComplete])
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      finish();
+      return;
+    }
+
+    const start = performance.now();
+    let ready = false;
+    let frame = 0;
+
+    // Ease toward 90% while waiting, then run to 100% once assets are in.
+    const tick = () => {
+      const elapsed = performance.now() - start;
+      if (ready && elapsed >= MIN_MS) return finish();
+      if (elapsed >= MAX_MS) return finish();
+      setProgress((p) => Math.min(90, p + (90 - p) * 0.06));
+      frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    waitForAssets().then(() => (ready = true));
+
+    const skip = (e: KeyboardEvent) => {
+      if (e.key === "Escape" || e.key === "Enter" || e.key === " ") finish();
+    };
+    window.addEventListener("keydown", skip);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("keydown", skip);
+    };
+  }, [onComplete]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Background overlay with blur effect */}
-      <div className="absolute inset-0 bg-black/80 backdrop-blur-md"></div>
+    <div
+      role="status"
+      aria-live="polite"
+      aria-label="Loading portfolio"
+      onClick={() => skipRef.current()}
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-ink transition-opacity duration-300 ${
+        leaving ? "opacity-0" : "opacity-100"
+      }`}
+    >
+      <div
+        aria-hidden
+        className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(43,108,176,0.28),transparent_55%)]"
+      />
 
-      <div className="relative text-center space-y-8">
-        {/* Magical Loading Animation */}
-        <div className="relative">
-          <div className="w-32 h-32 mx-auto relative">
-            {/* Outer circle */}
-            <div className="absolute inset-0 rounded-full border-4 border-white/20"></div>
-
-            {/* Rotating conic gradient ring */}
-            <div
-              className="absolute inset-0 rounded-full border-4 border-white border-t-transparent spin"
-              style={{
-                background: `conic-gradient(from 0deg, transparent, white)`,
-                borderRadius: "50%",
-              }}
-            ></div>
-
-            {/* Inner glowing circles */}
-            <div className="absolute inset-4 rounded-full bg-white/10 pulse"></div>
-            <div className="absolute inset-8 rounded-full bg-white/20 ping"></div>
+      <div className="relative flex flex-col items-center text-center">
+        {/* Moon ring: an orbiting crescent around the monogram */}
+        <div className="relative h-28 w-28">
+          <svg viewBox="0 0 112 112" className="absolute inset-0" aria-hidden>
+            <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1.5" />
+            <circle
+              cx="56"
+              cy="56"
+              r="52"
+              fill="none"
+              stroke="#8fd3ff"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeDasharray={2 * Math.PI * 52}
+              strokeDashoffset={2 * Math.PI * 52 * (1 - progress / 100)}
+              transform="rotate(-90 56 56)"
+              style={{ transition: "stroke-dashoffset 120ms linear" }}
+            />
+          </svg>
+          <div className="absolute inset-0 animate-orbit" aria-hidden>
+            <span className="absolute left-1/2 top-0 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-moon shadow-[0_0_12px_3px_rgba(143,211,255,0.6)]" />
           </div>
-
-          {/* Floating Sparkles */}
-          <div className="absolute -top-4 -left-4 w-2 h-2 bg-white rounded-full sparkle"></div>
-          <div className="absolute -top-2 -right-6 w-1 h-1 bg-white rounded-full sparkle" style={{ animationDelay: "0.5s" }}></div>
-          <div className="absolute -bottom-4 -right-2 w-3 h-3 bg-white/60 rounded-full sparkle" style={{ animationDelay: "1s" }}></div>
-          <div className="absolute -bottom-2 -left-6 w-1 h-1 bg-white rounded-full sparkle" style={{ animationDelay: "1.5s" }}></div>
+          <div className="absolute inset-0 flex items-center justify-center font-display text-2xl font-bold text-white">
+            RN
+          </div>
         </div>
 
-        {/* Loading Text */}
-        <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-white">Summoning the Blockchain Wizard</h2>
-          <div className="w-64 h-2 bg-white/20 rounded-full overflow-hidden mx-auto">
-            <div
-              className="h-full bg-gradient-to-r from-white to-white/60 transition-all duration-300 ease-out"
-              style={{ width: `${progress}%` }}
-            ></div>
-          </div>
-          <p className="text-white/70 text-sm">{progress}% Complete</p>
-        </div>
+        <p className="mt-8 font-display text-xl font-bold tracking-wide text-white">Rythme Nagrani</p>
+        <p className="mt-2 px-6 font-mono text-[11px] uppercase tracking-[0.14em] text-white/60 sm:text-xs sm:tracking-[0.2em]">
+          Summoning the blockchain wizard · {Math.round(progress)}%
+        </p>
       </div>
 
-      {/* Inline animations */}
-      <style jsx>{`
-        .spin {
-          animation: spin 1.5s linear infinite;
-        }
-        @keyframes spin {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
-        }
-
-        .pulse {
-          animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-          0%, 100% {
-            opacity: 0.6;
-            transform: scale(1);
-          }
-          50% {
-            opacity: 1;
-            transform: scale(1.1);
-          }
-        }
-
-        .ping {
-          animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
-        }
-        @keyframes ping {
-          0% {
-            transform: scale(1);
-            opacity: 1;
-          }
-          75%, 100% {
-            transform: scale(1.5);
-            opacity: 0;
-          }
-        }
-
-        .sparkle {
-          animation: sparkle 1.5s infinite ease-in-out;
-        }
-        @keyframes sparkle {
-          0%, 100% {
-            transform: scale(1);
-            opacity: 1;
-          }
-          50% {
-            transform: scale(1.5);
-            opacity: 0.5;
-          }
-        }
-      `}</style>
+      <p className="absolute bottom-8 font-mono text-[11px] text-white/40">Click or press Esc to skip</p>
     </div>
-  )
+  );
 }

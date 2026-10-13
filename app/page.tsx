@@ -1,52 +1,55 @@
 "use client"
 
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import Loader from "@/components/loader"
 import WizardIntro, { PermanentWizardPortrait } from "@/components/wizard-intro"
+import Nav from "@/components/nav"
 import HeroSection from "@/components/hero-section"
+import WorkSection from "@/components/work-section"
+import BuildsSection from "@/components/builds-section"
+import CommunitySection from "@/components/community-section"
 import ExperienceSection from "@/components/experience-section"
-import ProjectsSection from "@/components/project-section"
-import SkillsSection from "@/components/skills-section"
 import ContactSection from "@/components/contact-section"
+import { labs, profile } from "@/lib/content"
 
 export default function Home() {
   const [loadingComplete, setLoadingComplete] = useState(false)
   const [wizardAnimationComplete, setWizardAnimationComplete] = useState(false)
   const [showContent, setShowContent] = useState(false)
 
-  const handleLoadingComplete = () => {
-    setLoadingComplete(true)
-  }
+  const handleLoadingComplete = useCallback(() => setLoadingComplete(true), [])
 
-  const handleWizardAnimationComplete = () => {
+  const handleWizardAnimationComplete = useCallback(() => {
     setWizardAnimationComplete(true)
     // Small delay before showing content for smooth transition
     setTimeout(() => setShowContent(true), 5)
-  }
+  }, [])
 
   return (
-    <main className="min-h-screen bg-background text-foreground overflow-x-hidden relative ">
+    <main className="relative min-h-screen overflow-x-hidden bg-ink text-white">
+      <a
+        href="#work"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-white focus:px-4 focus:py-2 focus:text-ink"
+      >
+        Skip to work
+      </a>
+
       <div
-        className="fixed inset-0 w-full h-full opacity-30 pointer-events-none z-0"
+        aria-hidden
+        className="pointer-events-none fixed inset-0 z-0 opacity-[0.06]"
         style={{
           backgroundImage: "url('/illuminati-background.svg')",
           backgroundSize: "cover",
           backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          backgroundAttachment: "fixed",
         }}
       />
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(ellipse_at_80%_0%,rgba(43,108,176,0.16),transparent_55%)]"
+      />
 
-      <div className="fixed inset-0 bg-black/30 pointer-events-none z-10" />
+      {!loadingComplete && <Loader onComplete={handleLoadingComplete} />}
 
-      {/* Loading Screen */}
-      {!loadingComplete && (
-        <div className="relative z-20">
-          <Loader onComplete={handleLoadingComplete} />
-        </div>
-      )}
-
-      {/* Wizard Introduction Animation */}
       {loadingComplete && !wizardAnimationComplete && (
         <div className="relative z-20">
           <WizardIntro onAnimationComplete={handleWizardAnimationComplete} />
@@ -55,31 +58,43 @@ export default function Home() {
 
       {wizardAnimationComplete && <PermanentWizardPortrait />}
 
-      {/* Main Content */}
-      {showContent && (
-        <div className="animate-in fade-in duration-0 md:duration-1000 relative z-20">
-          <HeroSection />
-          <ExperienceSection />
-          <ProjectsSection />
-          <SkillsSection />
-          <ContactSection />
+      {/* The nav sits above the portrait layer (z-30), so it lives outside the content wrapper. */}
+      <div
+        className={`relative z-50 transition-opacity duration-700 ${showContent ? "opacity-100" : "pointer-events-none opacity-0"}`}
+        inert={!showContent}
+      >
+        <Nav />
+      </div>
 
-          {/* Footer */}
-          <footer className="py-12 px-6 border-t border-border/50 backdrop-blur-sm bg-black/30">
-            <div className="max-w-6xl mx-auto text-center space-y-4">
-              <div className="flex items-center justify-center gap-2 text-muted-foreground">
-                <span className="text-lg">△</span>
-                <p>© 456 BC Rythme Nagrani. Crafted with ancient wisdom and modern code</p>
-                <span className="text-lg">△</span>
-              </div>
-              <p className="text-sm text-muted-foreground font-mono">
-                Blockchain Wizard • Illuminati of Code • Master of Digital Realms
-              </p>
-              <p className="text-xs opacity-20 font-mono tracking-widest">ORDO AB CHAO • NOVUS ORDO SECLORUM</p>
-            </div>
-          </footer>
-        </div>
-      )}
+      {/* Content is always in the HTML for crawlers and no-JS; it just stays hidden until the intro ends. */}
+      <div
+        className={`relative z-20 transition-opacity duration-700 ${showContent ? "opacity-100" : "pointer-events-none opacity-0"}`}
+        inert={!showContent}
+      >
+        <HeroSection />
+        <WorkSection />
+        <BuildsSection />
+        <CommunitySection />
+        <ExperienceSection />
+        <ContactSection />
+
+        <footer className="border-t border-white/10 px-5 py-10 md:px-6">
+          <div className="mx-auto flex max-w-content flex-col gap-3 text-sm text-white/55 md:flex-row md:items-center md:justify-between">
+            <p>© {new Date().getFullYear()} {profile.name}. Built with Next.js, deployed on Vercel.</p>
+            <p className="flex gap-5">
+              <a href={labs.home} target="_blank" rel="noopener" className="hover:text-white">
+                Web3Spell Labs
+              </a>
+              <a href={profile.resume} target="_blank" rel="noopener" className="hover:text-white">
+                Resume
+              </a>
+              <a href="#top" className="hover:text-white">
+                Back to top ↑
+              </a>
+            </p>
+          </div>
+        </footer>
+      </div>
     </main>
   )
 }

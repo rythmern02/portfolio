@@ -2,308 +2,76 @@
 @tailwind components;
 @tailwind utilities;
 
-
-@import "tw-animate-css";
-
-@custom-variant dark (&:is(.dark *));
-
-:root {
-  /* Updated to professional dark magic theme - pure black and white only */
-  --background: oklch(0.05 0 0); /* Pure black background */
-  --foreground: oklch(0.98 0 0); /* Pure white text */
-  --card: oklch(0.08 0 0); /* Dark charcoal cards */
-  --card-foreground: oklch(0.98 0 0);
-  --popover: oklch(0.12 0 0); /* Darker popover */
-  --popover-foreground: oklch(0.98 0 0);
-  --primary: oklch(0.95 0 0); /* White primary for contrast */
-  --primary-foreground: oklch(0.05 0 0); /* Black text on white */
-  --secondary: oklch(0.15 0 0); /* Dark gray secondary */
-  --secondary-foreground: oklch(0.85 0 0); /* Light gray text */
-  --muted: oklch(0.18 0 0);
-  --muted-foreground: oklch(0.65 0 0);
-  --accent: oklch(0.92 0 0); /* Bright white accent */
-  --accent-foreground: oklch(0.05 0 0);
-  --destructive: oklch(0.45 0 0);
-  --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.25 0 0);
-  --input: oklch(0.15 0 0);
-  --ring: oklch(0.95 0 0 / 0.3); /* White glow ring */
-  --chart-1: oklch(0.85 0 0);
-  --chart-2: oklch(0.75 0 0);
-  --chart-3: oklch(0.65 0 0);
-  --chart-4: oklch(0.55 0 0);
-  --chart-5: oklch(0.45 0 0);
-  --radius: 0.75rem;
-  --sidebar: oklch(0.05 0 0);
-  --sidebar-foreground: oklch(0.98 0 0);
-  --sidebar-primary: oklch(0.95 0 0);
-  --sidebar-primary-foreground: oklch(0.05 0 0);
-  --sidebar-accent: oklch(0.18 0 0);
-  --sidebar-accent-foreground: oklch(0.98 0 0);
-  --sidebar-border: oklch(0.25 0 0);
-  --sidebar-ring: oklch(0.95 0 0 / 0.3);
-
-  /* Updated custom variables for monochromatic magic theme */
-  --glow-white: oklch(0.98 0 0);
-  --glow-gray: oklch(0.75 0 0);
-  --magic-gradient: linear-gradient(135deg, oklch(0.05 0 0), oklch(0.15 0 0), oklch(0.05 0 0));
-}
-
-.dark {
-  /* Dark mode uses same monochromatic values */
-  --background: oklch(0.02 0 0);
-  --foreground: oklch(0.98 0 0);
-  --card: oklch(0.05 0 0);
-  --card-foreground: oklch(0.98 0 0);
-  --popover: oklch(0.05 0 0);
-  --popover-foreground: oklch(0.98 0 0);
-  --primary: oklch(0.98 0 0);
-  --primary-foreground: oklch(0.02 0 0);
-  --secondary: oklch(0.12 0 0);
-  --secondary-foreground: oklch(0.98 0 0);
-  --muted: oklch(0.12 0 0);
-  --muted-foreground: oklch(0.65 0 0);
-  --accent: oklch(0.12 0 0);
-  --accent-foreground: oklch(0.98 0 0);
-  --destructive: oklch(0.45 0 0);
-  --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.12 0 0);
-  --input: oklch(0.12 0 0);
-  --ring: oklch(0.98 0 0 / 0.3);
-  --chart-1: oklch(0.85 0 0);
-  --chart-2: oklch(0.75 0 0);
-  --chart-3: oklch(0.65 0 0);
-  --chart-4: oklch(0.55 0 0);
-  --chart-5: oklch(0.45 0 0);
-  --sidebar: oklch(0.02 0 0);
-  --sidebar-foreground: oklch(0.98 0 0);
-  --sidebar-primary: oklch(0.85 0 0);
-  --sidebar-primary-foreground: oklch(0.98 0 0);
-  --sidebar-accent: oklch(0.12 0 0);
-  --sidebar-accent-foreground: oklch(0.98 0 0);
-  --sidebar-border: oklch(0.12 0 0);
-  --sidebar-ring: oklch(0.98 0 0 / 0.3);
-}
-
-@theme inline {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
-}
-
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
+  html {
+    background: #06070b;
+    color: #f4f6fa;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
+
   body {
-    @apply bg-background text-foreground;
-    /* Added subtle paper texture overlay */
-    background-image: radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-      radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.01) 1px, transparent 1px),
-      radial-gradient(circle at 45% 85%, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
-    background-size: 100px 100px, 150px 150px, 200px 200px;
+    background: #06070b;
+    font-size: 1rem;
+    line-height: 1.65;
   }
 
-  /* Added illuminati-themed animations and effects */
-  @keyframes illuminatiPulse {
-    0%,
-    100% {
-      opacity: 0.3;
-      transform: scale(1);
-    }
-    50% {
-      opacity: 0.6;
-      transform: scale(1.05);
-    }
+  /* Leave room for the fixed nav when jumping to a section. */
+  section[id] {
+    scroll-margin-top: 5rem;
   }
 
-  @keyframes mysticalFloat {
-    0%,
-    100% {
-      transform: translateY(0px) rotate(0deg);
-    }
-    33% {
-      transform: translateY(-8px) rotate(2deg);
-    }
-    66% {
-      transform: translateY(4px) rotate(-1deg);
-    }
+  ::selection {
+    background: rgba(143, 211, 255, 0.3);
+    color: #fff;
   }
 
-  @keyframes crackSpread {
-    0% {
-      stroke-dasharray: 0, 200;
-      opacity: 0;
-    }
-    50% {
-      opacity: 0.8;
-    }
-    100% {
-      stroke-dasharray: 200, 0;
-      opacity: 0.3;
-    }
+  :focus-visible {
+    outline: 2px solid #8fd3ff;
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+}
+
+@layer components {
+  .eyebrow {
+    @apply font-mono text-xs uppercase tracking-[0.18em] text-moon;
   }
 
-  @keyframes ancientGlow {
-    0%,
-    100% {
-      text-shadow: 0 0 5px rgba(255, 255, 255, 0.3), 0 0 10px rgba(255, 255, 255, 0.2), 0 0 15px
-        rgba(255, 255, 255, 0.1);
-    }
-    50% {
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 255, 255, 0.3), 0 0 30px
-        rgba(255, 255, 255, 0.2);
-    }
+  .section-title {
+    @apply font-display text-3xl font-bold leading-tight text-white md:text-[2.5rem];
   }
 
-  /* Updated existing animations */
-  @keyframes float {
-    0%,
-    100% {
-      transform: translateY(0px);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
+  .card {
+    @apply rounded-2xl border border-white/10 bg-panel/80 backdrop-blur-sm;
   }
 
-  @keyframes glow {
-    0%,
-    100% {
-      box-shadow: 0 0 20px var(--glow-white);
-    }
-    50% {
-      box-shadow: 0 0 40px var(--glow-white), 0 0 60px var(--glow-gray);
-    }
+  .chip {
+    @apply inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-0.5 font-mono text-[11px] text-white/75;
   }
 
-  @keyframes sparkle {
-    0%,
-    100% {
-      opacity: 0;
-      transform: scale(0);
-    }
-    50% {
-      opacity: 1;
-      transform: scale(1);
-    }
+  .text-link {
+    @apply text-moon underline decoration-moon/30 underline-offset-4 transition-colors hover:decoration-moon;
   }
 
-  @keyframes slideInFromCenter {
-    0% {
-      transform: translate(-50%, -50%) scale(0.8);
-      opacity: 0;
-    }
-    50% {
-      transform: translate(-50%, -50%) scale(1.1);
-      opacity: 1;
-    }
-    100% {
-      transform: translate(0, 0) scale(1);
-      opacity: 1;
-    }
+  .btn-primary {
+    @apply inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-medium text-ink transition hover:bg-moon-soft;
   }
 
-  /* Added new utility classes for illuminati theme */
-  .animate-illuminati-pulse {
-    animation: illuminatiPulse 4s ease-in-out infinite;
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 rounded-full border border-white/20 px-5 py-2.5 text-sm font-medium text-white transition hover:border-white/50 hover:bg-white/5;
   }
+}
 
-  .animate-mystical-float {
-    animation: mysticalFloat 6s ease-in-out infinite;
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
-
-  .animate-crack-spread {
-    animation: crackSpread 3s ease-out forwards;
-  }
-
-  .animate-ancient-glow {
-    animation: ancientGlow 3s ease-in-out infinite;
-  }
-
-  .animate-float {
-    animation: float 3s ease-in-out infinite;
-  }
-
-  .animate-glow {
-    animation: glow 2s ease-in-out infinite;
-  }
-
-  .animate-sparkle {
-    animation: sparkle 1.5s ease-in-out infinite;
-  }
-
-  .animate-slide-from-center {
-    animation: slideInFromCenter 2s ease-out forwards;
-  }
-
-  .magic-gradient {
-    background: var(--magic-gradient);
-  }
-
-  .text-glow {
-    /* Updated text glow to use white instead of cyan */
-    text-shadow: 0 0 10px var(--glow-white), 0 0 20px var(--glow-white), 0 0 30px var(--glow-white);
-  }
-
-  /* Added illuminati-specific styling classes */
-  .illuminati-background {
-    position: relative;
-  }
-
-  .illuminati-background::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.05) 2px, transparent 2px),
-      radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-    background-size: 50px 50px, 80px 80px;
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  .mystical-border {
-    border-image: linear-gradient(45deg, transparent 25%, rgba(255, 255, 255, 0.3) 50%, transparent 75%) 1;
-  }
-
-  .ancient-text {
-    font-family: "Times New Roman", serif;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
