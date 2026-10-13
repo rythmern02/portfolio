@@ -9,7 +9,7 @@ export default function CommunitySection() {
   return (
     <section id="community" className="px-5 py-24 md:px-6">
       <div className="mx-auto max-w-content">
-        <SectionHeading index="III" eyebrow="Developer relations" title="I bring developers onchain, then help them ship">
+        <SectionHeading index="III" eyebrow="Developer relations" title="Developers, brought onchain">
           Bootcamps, hackathons and build stations across India, run through Web3Spell with ecosystem teams from Solana,
           Arbitrum, Ethereum and more.
         </SectionHeading>

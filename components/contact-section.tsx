@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ArrowUpRight, Check, Copy, Loader2 } from "lucide-react";
 import { profile } from "@/lib/content";
+import SpellButton from "./arcane/spell-button";
 
 const field =
   "w-full rounded-xl border border-white/15 bg-black/40 px-4 py-3 text-[15px] text-white placeholder:text-white/40 transition-colors focus:border-moon focus:outline-none";
@@ -49,14 +50,16 @@ export default function ContactSection() {
       <div className="mx-auto grid max-w-content gap-12 lg:grid-cols-2 lg:gap-16">
         <div data-reveal>
           <p className="eyebrow">
-            <span className="text-white/40">Chapter V</span>
-            <span aria-hidden className="mx-2 inline-block h-px w-8 translate-y-[-3px] bg-gold/60" />
-            Summon
+            <span className="text-white/35">V</span>
+            <span aria-hidden className="mx-2 text-gold/60">
+              ✦
+            </span>
+            Contact
           </p>
           <h2 className="section-title mt-4">
-            <span className="sr-only">Hiring for DevRel or protocol engineering?</span>
-            <span aria-hidden data-decipher="Hiring for DevRel or protocol engineering?">
-              Hiring for DevRel or protocol engineering?
+            <span className="sr-only">{"Hiring? Let's talk."}</span>
+            <span aria-hidden data-decipher="Hiring? Let's talk.">
+              {"Hiring? Let's talk."}
             </span>
           </h2>
           <p className="mt-4 text-lg leading-relaxed text-white/75">
@@ -65,9 +68,9 @@ export default function ContactSection() {
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            <a href={`mailto:${profile.email}`} className="btn-primary">
-              {profile.email}
-            </a>
+            <SpellButton href={`mailto:${profile.email}`} icon="✉">
+              Email me
+            </SpellButton>
             <button type="button" onClick={copyEmail} className="btn-ghost" aria-live="polite">
               {copied ? <Check className="h-4 w-4 text-emerald-400" aria-hidden /> : <Copy className="h-4 w-4" aria-hidden />}
               {copied ? "Copied" : "Copy email"}

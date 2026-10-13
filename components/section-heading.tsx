@@ -14,8 +14,10 @@ export default function SectionHeading({
   return (
     <header className="max-w-2xl" data-reveal>
       <p className="eyebrow">
-        <span className="text-white/40">Chapter {index}</span>
-        <span aria-hidden className="mx-2 inline-block h-px w-8 translate-y-[-3px] bg-gold/60" />
+        <span className="text-white/35">{index}</span>
+        <span aria-hidden className="mx-2 text-gold/60">
+          ✦
+        </span>
         {eyebrow}
       </p>
       <h2 className="section-title mt-4">

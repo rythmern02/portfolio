@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { film } from "@/lib/content";
 import Sigil from "./sigil";
+import SpellButton from "./spell-button";
 import { decipher } from "./decipher";
 
 // ---------------------------------------------------------------------------
@@ -128,8 +129,6 @@ export default function Film() {
   const bgSigilRef = useRef<HTMLDivElement>(null);
   const portalRef = useRef<HTMLDivElement>(null);
   const chapterRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const hudChapter = useRef<HTMLSpanElement>(null);
-  const hudFrame = useRef<HTMLSpanElement>(null);
   const hintRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -430,9 +429,7 @@ export default function Film() {
         if (word && lastChapter !== -1 && !reduced) decipher(word);
         if (lastChapter !== -1) window.dispatchEvent(new CustomEvent("arcane:chapter", { detail: current }));
         lastChapter = current;
-        if (hudChapter.current) hudChapter.current.textContent = String(current + 1).padStart(2, "0");
       }
-      if (hudFrame.current) hudFrame.current.textContent = `${(p * 100).toFixed(1).padStart(4, "0")} / FRAME ${String(Math.round(p * 240)).padStart(3, "0")}`;
       if (hintRef.current) hintRef.current.style.opacity = String(1 - range(p, 0.02, 0.08));
     };
 
@@ -505,15 +502,6 @@ export default function Film() {
         />
         <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-ink via-ink/70 to-transparent" />
 
-        {/* HUD frame */}
-        <div aria-hidden className="hud-corners pointer-events-none absolute inset-4 md:inset-8" />
-        <div aria-hidden className="pointer-events-none absolute left-5 top-20 font-mono text-[10px] uppercase tracking-[0.25em] text-gold md:left-10 md:top-24">
-          Chapter <span ref={hudChapter}>01</span> / {String(film.length).padStart(2, "0")}
-        </div>
-        <div aria-hidden className="pointer-events-none absolute right-5 top-20 hidden font-mono text-[10px] uppercase tracking-[0.25em] text-white/45 sm:block md:right-16 md:top-24">
-          Sight <span ref={hudFrame}>00.0 / FRAME 000</span>
-        </div>
-
         {/* Chapters */}
         {film.map((ch, i) => (
           <div
@@ -547,16 +535,11 @@ export default function Film() {
             )}
             {ch.body && <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-white/85 [text-shadow:0_1px_14px_#04050a] md:text-base">{ch.body}</p>}
             {ch.ctas && (
-              <div className="mt-6 flex flex-wrap justify-center gap-3">
+              <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
                 {ch.ctas.map((c, k) => (
-                  <a
-                    key={c.href + c.label}
-                    href={c.href}
-                    {...(c.href.startsWith("/") ? { target: "_blank", rel: "noopener" } : {})}
-                    className={k === 0 ? "btn-arcane" : "btn-ghost"}
-                  >
+                  <SpellButton key={c.href + c.label} href={c.href} variant={k === 0 ? "cast" : "trace"}>
                     {c.label}
-                  </a>
+                  </SpellButton>
                 ))}
               </div>
             )}
@@ -564,16 +547,10 @@ export default function Film() {
         ))}
 
         <div ref={hintRef} className="absolute inset-x-0 bottom-[3%] flex flex-col items-center gap-2 text-white/55" aria-hidden>
-          <span className="font-mono text-[10px] uppercase tracking-[0.3em]">Scroll to cast</span>
+          <span className="font-display text-[10px] uppercase tracking-[0.35em]">Scroll to cast</span>
           <span className="h-8 w-px animate-pulse bg-gradient-to-b from-moon to-transparent" />
         </div>
 
-        <a
-          href="#work"
-          className="absolute bottom-6 left-5 font-mono text-[10px] uppercase tracking-[0.25em] text-white/55 hover:text-moon md:bottom-10 md:left-10"
-        >
-          Skip the film ↓
-        </a>
       </div>
     </section>
   );

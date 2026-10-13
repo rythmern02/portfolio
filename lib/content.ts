@@ -346,27 +346,18 @@ export const film: FilmChapter[] = [
     lead: "If you're shipping onchain, I",
     word: "BUILD",
     body: "Protocols on Base, Solana, Rootstock and Somnia: Certora-reviewed DeFi, zero-knowledge payroll and execution engines.",
-    ctas: [
-      { label: "See the work", href: "#work" },
-      { label: "Resume", href: "/Rythme-Nagrani-Resume.pdf" },
-    ],
   },
   {
     window: [0.39, 0.55],
     lead: "If you're growing a developer ecosystem, I",
     word: "TEACH",
     body: "75+ developer events and 5,000+ developers reached. Bootcamps, hackathons and docs, and I write the code behind them.",
-    ctas: [
-      { label: "Developer relations", href: "#community" },
-      { label: "Get in touch", href: "#contact" },
-    ],
   },
   {
     window: [0.58, 0.72],
     lead: "When it counts, I",
     word: "WIN",
     body: "TOKEN2049 Origins Hackathon winner. $17K Compound grant. Author on the Rootstock Developer Portal.",
-    ctas: [{ label: "Recognition", href: "#community" }],
   },
   {
     window: [0.8, 1.01],
@@ -374,7 +365,7 @@ export const film: FilmChapter[] = [
     word: "SEE WHAT I'VE CAST",
     ctas: [
       { label: "Enter the grimoire", href: "#work" },
-      { label: "Summon me", href: "#contact" },
+      { label: "Say hello", href: "#contact" },
     ],
   },
 ];

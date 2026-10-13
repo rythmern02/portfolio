@@ -1,21 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { FileText, Volume2, VolumeX } from "lucide-react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { nav, profile } from "@/lib/content";
 import { sound } from "./arcane/sound";
 import Sigil from "./arcane/sigil";
+import SpellButton from "./arcane/spell-button";
 
-// Fantasy names sit under the plain labels: the plain one is what you scan for.
-const LORE: Record<string, string> = {
-  "#work": "Spells",
-  "#builds": "Artifacts",
-  "#community": "The guild",
-  "#experience": "Lore",
-  "#contact": "Summon",
-};
-const NUMERALS = ["I", "II", "III", "IV", "V"];
-
+// Icon-only sound toggle: three bars that dance while the ambience plays.
 function SoundToggle() {
   const [on, setOn] = useState(false);
   useEffect(() => {
@@ -28,10 +19,17 @@ function SoundToggle() {
       type="button"
       onClick={() => setOn(sound?.toggle() ?? false)}
       aria-pressed={on}
-      className="inline-flex items-center gap-1.5 rounded-full border border-white/15 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-white/75 transition hover:border-moon/60 hover:text-white"
+      aria-label={on ? "Turn sound off" : "Turn sound on"}
+      title={on ? "Sound on" : "Sound off"}
+      className="group flex h-10 w-10 items-center justify-center gap-[3px] rounded-full transition hover:bg-white/5"
     >
-      {on ? <Volume2 className="h-3.5 w-3.5 text-moon" aria-hidden /> : <VolumeX className="h-3.5 w-3.5" aria-hidden />}
-      Sound {on ? "on" : "off"}
+      {[6, 12, 8, 4].map((h, i) => (
+        <span
+          key={i}
+          className={`w-[2px] rounded-full transition-colors ${on ? "eq-bar bg-moon" : "bg-white/45 group-hover:bg-white"}`}
+          style={on ? { animationDelay: `${i * 0.15}s` } : { height: h }}
+        />
+      ))}
     </button>
   );
 }
@@ -40,6 +38,8 @@ export default function Nav() {
   const [active, setActive] = useState<string>("");
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const linkRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
+  const [moon, setMoon] = useState<{ x: number; w: number } | null>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -62,6 +62,12 @@ export default function Nav() {
     };
   }, []);
 
+  // Slide the moon under the active link.
+  useLayoutEffect(() => {
+    const el = linkRefs.current[active];
+    setMoon(el ? { x: el.offsetLeft + el.offsetWidth / 2, w: el.offsetWidth } : null);
+  }, [active]);
+
   useEffect(() => {
     if (!open) return;
     const close = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
@@ -75,98 +81,102 @@ export default function Nav() {
 
   return (
     <>
-      <header
-        className={`fixed inset-x-0 top-0 z-50 transition-colors duration-500 ${
-          scrolled && !open ? "border-b border-white/[0.07] bg-ink/70 backdrop-blur-md" : "bg-transparent"
-        }`}
-      >
-        <nav aria-label="Main" className="mx-auto flex h-16 max-w-[90rem] items-center justify-between px-5 md:px-10">
-          <a href="#top" className="group flex items-center gap-3" onClick={() => setOpen(false)}>
-            <Sigil id="nav-sigil" className="h-8 w-8 animate-spin-slow text-moon transition group-hover:text-white" />
-            <span className="leading-tight">
-              <span className="block font-display text-sm font-semibold tracking-[0.22em] text-white">RYTHME</span>
-              <span className="block font-mono text-[9px] uppercase tracking-[0.22em] text-gold">Protocol · DevRel</span>
-            </span>
+      <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4 md:px-8 md:pt-5">
+        <nav aria-label="Main" className="mx-auto flex max-w-[84rem] items-center justify-between gap-4">
+          <a href="#top" className="group flex items-center gap-2.5" onClick={() => setOpen(false)}>
+            <Sigil id="nav-sigil" className="h-9 w-9 animate-spin-slow text-moon transition duration-500 group-hover:text-white" />
+            <span className="font-display text-[15px] font-semibold tracking-[0.24em] text-white">RYTHME</span>
           </a>
 
-          <ul className="hidden items-center gap-1 lg:flex">
-            {nav.map((item, i) => (
-              <li key={item.href}>
-                <a
-                  href={item.href}
-                  aria-current={active === item.href ? "true" : undefined}
-                  className={`group flex items-baseline gap-1.5 rounded-full px-3.5 py-1.5 text-sm transition-colors ${
-                    active === item.href ? "text-white" : "text-white/65 hover:text-white"
-                  }`}
-                >
-                  <span className={`font-mono text-[10px] ${active === item.href ? "text-moon" : "text-gold/70"}`}>{NUMERALS[i]}</span>
-                  {item.label}
-                </a>
-              </li>
-            ))}
-          </ul>
+          <div
+            className={`relative hidden items-center rounded-full border px-2 py-1.5 backdrop-blur-xl transition-colors duration-500 lg:flex ${
+              scrolled ? "border-white/10 bg-ink/60" : "border-white/[0.06] bg-white/[0.02]"
+            }`}
+          >
+            <ul className="relative flex items-center">
+              {nav.map((item) => (
+                <li key={item.href}>
+                  <a
+                    ref={(el) => {
+                      linkRefs.current[item.href] = el;
+                    }}
+                    href={item.href}
+                    aria-current={active === item.href ? "true" : undefined}
+                    className={`block px-4 py-1.5 text-[13px] tracking-wide transition-colors duration-300 ${
+                      active === item.href ? "text-white" : "text-white/55 hover:text-white"
+                    }`}
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+            {/* the gliding moon */}
+            <span
+              aria-hidden
+              className="pointer-events-none absolute -bottom-[3px] h-[6px] w-[6px] -translate-x-1/2 rounded-full bg-moon shadow-[0_0_12px_3px_rgba(143,211,255,0.7)] transition-all duration-500 ease-[cubic-bezier(0.2,0.7,0.2,1)]"
+              style={{ left: moon ? moon.x + 8 : 0, opacity: moon ? 1 : 0 }}
+            />
+          </div>
 
-          <div className="flex items-center gap-2">
-            <div className="hidden sm:block">
-              <SoundToggle />
-            </div>
-            <a href={profile.resume} target="_blank" rel="noopener" className="btn-arcane hidden !px-4 !py-1.5 !text-xs md:inline-flex">
-              <FileText className="h-3.5 w-3.5" aria-hidden />
+          <div className="flex items-center gap-1 md:gap-2">
+            <SoundToggle />
+            <SpellButton href={profile.resume} className="hidden !px-5 !py-2.5 md:inline-flex" icon="✦">
               Resume
-            </a>
+            </SpellButton>
             <button
               type="button"
-              className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-full border border-white/15 lg:hidden"
+              className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-full lg:hidden"
               aria-expanded={open}
               aria-controls="grimoire-menu"
               aria-label={open ? "Close menu" : "Open menu"}
               onClick={() => setOpen((o) => !o)}
             >
-              <span className={`h-px w-4 bg-white transition ${open ? "translate-y-[3.5px] rotate-45" : ""}`} />
-              <span className={`h-px w-4 bg-white transition ${open ? "-translate-y-[3.5px] -rotate-45" : ""}`} />
+              <span className={`h-px w-5 bg-white transition duration-300 ${open ? "translate-y-[3.5px] rotate-45" : ""}`} />
+              <span className={`h-px w-5 bg-white transition duration-300 ${open ? "-translate-y-[3.5px] -rotate-45" : ""}`} />
             </button>
           </div>
         </nav>
       </header>
 
-      {/* Full-screen grimoire index for smaller screens */}
+      {/* Full-screen menu for smaller screens */}
       <div
         id="grimoire-menu"
-        className={`fixed inset-0 z-40 flex flex-col justify-center bg-ink/95 px-6 backdrop-blur-xl transition-all duration-500 lg:hidden ${
+        className={`fixed inset-0 z-40 flex flex-col justify-center bg-ink/95 px-8 backdrop-blur-xl transition-all duration-500 lg:hidden ${
           open ? "visible opacity-100" : "invisible opacity-0"
         }`}
         inert={!open}
       >
         <Sigil
           id="menu-sigil"
-          className={`pointer-events-none absolute -right-32 top-1/2 h-[34rem] w-[34rem] -translate-y-1/2 text-moon/10 transition-transform duration-1000 ${
+          className={`pointer-events-none absolute -right-40 top-1/2 h-[36rem] w-[36rem] -translate-y-1/2 text-moon/[0.08] transition-transform duration-[1.5s] ${
             open ? "rotate-90" : ""
           }`}
         />
-        <ol className="relative space-y-1">
+        <ol className="relative space-y-2">
           {nav.map((item, i) => (
             <li
               key={item.href}
               className="transition-all duration-500"
               style={{ transitionDelay: open ? `${80 + i * 60}ms` : "0ms", opacity: open ? 1 : 0, transform: open ? "none" : "translateY(16px)" }}
             >
-              <a href={item.href} onClick={() => setOpen(false)} className="group flex items-baseline gap-4 py-2.5">
-                <span className="w-8 font-mono text-xs text-gold">{NUMERALS[i]}</span>
-                <span className={`font-display text-4xl font-semibold tracking-[0.06em] ${active === item.href ? "text-moon" : "text-white"}`}>
+              <a href={item.href} onClick={() => setOpen(false)} className="flex items-center gap-4 py-2">
+                <span aria-hidden className={`text-sm ${active === item.href ? "text-moon" : "text-white/20"}`}>
+                  ☾
+                </span>
+                <span className={`font-display text-4xl font-semibold tracking-[0.08em] ${active === item.href ? "text-moon" : "text-white"}`}>
                   {item.label}
                 </span>
-                <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/40">{LORE[item.href]}</span>
               </a>
             </li>
           ))}
         </ol>
-        <div className="relative mt-10 flex flex-wrap items-center gap-3">
-          <a href={profile.resume} target="_blank" rel="noopener" className="btn-arcane">
-            <FileText className="h-4 w-4" aria-hidden /> Download resume
-          </a>
-          <SoundToggle />
+        <div className="relative mt-12">
+          <SpellButton href={profile.resume} icon="✦">
+            Resume
+          </SpellButton>
         </div>
-        <ul className="relative mt-8 flex gap-5 text-sm text-white/60">
+        <ul className="relative mt-10 flex gap-6 text-sm text-white/55">
           {profile.socials.map((s) => (
             <li key={s.label}>
               <a href={s.href} target="_blank" rel="noopener" className="hover:text-moon">

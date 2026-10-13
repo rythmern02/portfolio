@@ -81,7 +81,7 @@ export default function WorkSection() {
   return (
     <section id="work" className="px-5 py-24 md:px-6">
       <div className="mx-auto max-w-content">
-        <SectionHeading index="I" eyebrow="Selected work" title="Protocols I designed, built and shipped">
+        <SectionHeading index="I" eyebrow="Selected work" title="Protocols I've shipped">
           Three products with real money, real audits or real users behind them. The full write-ups live on the{" "}
           <a href={labs.work} target="_blank" rel="noopener" className="text-link">
             Web3Spell Labs

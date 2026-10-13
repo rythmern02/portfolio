@@ -5,8 +5,6 @@ import Lenis from "lenis"
 import Loader from "@/components/loader"
 import Nav from "@/components/nav"
 import Film from "@/components/arcane/film"
-import ManaRail from "@/components/arcane/mana-rail"
-import SummonButton from "@/components/arcane/summon-button"
 import WandCursor from "@/components/arcane/wand-cursor"
 import RevealObserver from "@/components/arcane/reveal"
 import WorkSection from "@/components/work-section"
@@ -47,8 +45,6 @@ export default function Home() {
 
       <div className={`transition-opacity duration-700 ${ready ? "opacity-100" : "opacity-0"}`}>
         <Nav />
-        <ManaRail />
-        <SummonButton />
       </div>
 
       <Film />

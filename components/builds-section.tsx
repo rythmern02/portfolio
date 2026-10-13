@@ -2,18 +2,19 @@ import Image from "next/image";
 import { ArrowUpRight, Github } from "lucide-react";
 import { builds, earlierWork, labs } from "@/lib/content";
 import SectionHeading from "./section-heading";
+import SpellButton from "./arcane/spell-button";
 
 export default function BuildsSection() {
   return (
     <section id="builds" className="px-5 py-24 md:px-6">
       <div className="mx-auto max-w-content">
         <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
-          <SectionHeading index="II" eyebrow="Latest builds" title="Shipping across chains, every month">
+          <SectionHeading index="II" eyebrow="Latest builds" title="Fresh from the forge">
             Smaller builds from 2025 and 2026: account abstraction, agent payments, staking and 3D web.
           </SectionHeading>
-          <a href={labs.portfolio} target="_blank" rel="noopener" className="btn-ghost shrink-0 self-start md:self-auto">
-            All 15+ builds <ArrowUpRight className="h-4 w-4" aria-hidden />
-          </a>
+          <SpellButton href={labs.portfolio} variant="trace" className="shrink-0 self-start md:self-auto">
+            All 15+ builds
+          </SpellButton>
         </div>
 
         <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
