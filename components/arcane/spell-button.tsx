@@ -3,10 +3,12 @@
 import { useRef } from "react";
 import type React from "react";
 import { decipher } from "./decipher";
+import { CALENDLY_URL, openBooking } from "@/lib/booking";
 
 // The site's buttons. "cast" is a dark glass pill with a comet of moonlight
 // orbiting its border; "trace" is a quiet text link whose underline draws
 // itself in. On hover the label briefly scrambles into runes and resolves.
+// href="book" opens the Calendly modal (and links to Calendly without JS).
 
 type Props = {
   href: string;
@@ -19,6 +21,8 @@ type Props = {
 
 export default function SpellButton({ href, children, variant = "cast", icon, className = "", onClick }: Props) {
   const label = useRef<HTMLSpanElement>(null);
+  const book = href === "book";
+  if (book) href = CALENDLY_URL;
   const external = href.startsWith("http") || href.endsWith(".pdf") || href.startsWith("mailto:");
   const cast = () => {
     if (label.current && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) decipher(label.current, 420);
@@ -29,7 +33,13 @@ export default function SpellButton({ href, children, variant = "cast", icon, cl
       href={href}
       onMouseEnter={cast}
       onFocus={cast}
-      onClick={onClick}
+      onClick={(e) => {
+        if (book) {
+          e.preventDefault();
+          openBooking();
+        }
+        onClick?.(e);
+      }}
       {...(external && !href.startsWith("mailto:") ? { target: "_blank", rel: "noopener" } : {})}
       className={`${variant === "cast" ? "spell" : "spell-trace"} ${className}`}
     >

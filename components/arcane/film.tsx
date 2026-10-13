@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { film } from "@/lib/content";
 import Sigil from "./sigil";
 import SpellButton from "./spell-button";
+import Aura from "./aura";
 import { decipher } from "./decipher";
 
 // ---------------------------------------------------------------------------
@@ -13,7 +14,7 @@ import { decipher } from "./decipher";
 //           ignite from hem to hat as you scroll
 //   eyes    moon sigils light up in both irises
 //   fire    blue "moonfire" particles along the bottom edge
-//   glyphs  chain symbols and runes drifting upward
+//   motes   faint points of light drifting upward and twinkling
 // Everything is drawn to one canvas; chapter text is plain DOM on top.
 // ---------------------------------------------------------------------------
 
@@ -36,7 +37,6 @@ const CAMERA = [
   { p: 1, x: EYES[0][0], y: EYES[0][1], z: 9 },
 ];
 
-const GLYPHS = ["◎", "⟠", "₿", "ᚱ", "ᛟ", "✦", "0x", "{ }", "☾", "ᛉ", "∞", "Ξ", "λ"];
 
 const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 const smooth = (t: number) => t * t * (3 - 2 * t);
@@ -132,28 +132,24 @@ function haloSprite() {
   return c;
 }
 
-function glyphSprite(ch: string, px: number, font: string) {
-  const pad = 4;
-  const probe = makeCanvas(1, 1).getContext("2d")!;
-  probe.font = `${px}px ${font}`;
-  const w = Math.ceil(probe.measureText(ch).width) + pad * 2;
-  const h = Math.ceil(px * 1.4) + pad * 2;
-  const c = makeCanvas(w * 2, h * 2);
+function moteSprite() {
+  const s = 32;
+  const c = makeCanvas(s, s);
   const g = c.getContext("2d")!;
-  g.scale(2, 2);
-  g.font = `${px}px ${font}`;
-  g.textAlign = "center";
-  g.textBaseline = "middle";
-  g.fillStyle = "#c6e8ff";
-  g.fillText(ch, w / 2, h / 2);
-  return { c, w, h };
+  const grad = g.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+  grad.addColorStop(0, "rgba(240,250,255,1)");
+  grad.addColorStop(0.2, "rgba(198,232,255,0.8)");
+  grad.addColorStop(1, "rgba(143,211,255,0)");
+  g.fillStyle = grad;
+  g.fillRect(0, 0, s, s);
+  return c;
 }
 
 type Flame = { x: number; y: number; vx: number; vy: number; life: number; max: number; size: number; seed: number };
-type Glyph = {
+type Mote = {
   x: number;
   y: number;
-  sprite: ReturnType<typeof glyphSprite>;
+  size: number;
   alpha: number;
   speed: number;
   depth: number;
@@ -186,6 +182,7 @@ export default function Film() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const bgSigilRef = useRef<HTMLDivElement>(null);
   const portalRef = useRef<HTMLDivElement>(null);
+  const portalLive = useRef(false);
   const chapterRefs = useRef<(HTMLDivElement | null)[]>([]);
   const hintRef = useRef<HTMLDivElement>(null);
 
@@ -211,10 +208,10 @@ export default function Film() {
     const sprite = flameSprite();
     const halo = haloSprite();
 
-    const mono = getComputedStyle(document.documentElement).getPropertyValue("--font-geist-mono").trim() || "monospace";
     const flames: Flame[] = [];
     const flameCount = mobile ? 60 : 110;
-    const glyphs: Glyph[] = [];
+    const motes: Mote[] = [];
+    const mote = moteSprite();
 
     const resize = () => {
       // The portrait is 500px, so rendering past 1.5x buys no detail, only cost.
@@ -225,15 +222,15 @@ export default function Film() {
       canvas.height = Math.round(H * dpr);
       trackTop = track.offsetTop;
       trackH = track.offsetHeight;
-      glyphs.length = 0;
-      const n = mobile ? 14 : 26;
+      motes.length = 0;
+      const n = mobile ? 26 : 48;
       for (let i = 0; i < n; i++) {
-        glyphs.push({
+        motes.push({
           x: Math.random() * W,
           y: Math.random() * H,
-          sprite: glyphSprite(GLYPHS[i % GLYPHS.length], 11 + Math.random() * 18, mono),
-          alpha: 0.08 + Math.random() * 0.2,
-          speed: 6 + Math.random() * 16,
+          size: 4 + Math.random() * Math.random() * 14,
+          alpha: 0.15 + Math.random() * 0.45,
+          speed: 4 + Math.random() * 12,
           depth: 0.3 + Math.random() * 0.9,
           seed: Math.random() * 100,
         });
@@ -397,23 +394,25 @@ export default function Film() {
         ctx.fillRect(0, 0, W, H);
       }
 
-      // ---- glyphs ---------------------------------------------------------
+      // ---- motes ----------------------------------------------------------
       ctx.save();
-      for (const gl of glyphs) {
+      ctx.globalCompositeOperation = "lighter";
+      for (const m of motes) {
         if (!reduced) {
-          gl.y -= gl.speed * gl.depth * dt;
-          if (gl.y < -30) {
-            gl.y = H + 30;
-            gl.x = Math.random() * W;
+          m.y -= m.speed * m.depth * dt;
+          if (m.y < -30) {
+            m.y = H + 30;
+            m.x = Math.random() * W;
           }
         }
-        const y = gl.y - p * H * 0.6 * gl.depth;
+        const y = m.y - p * H * 0.6 * m.depth;
         const yy = ((y % (H + 60)) + H + 60) % (H + 60) - 30;
-        const x = gl.x + Math.sin(t * 0.6 + gl.seed) * 18 * gl.depth;
-        ctx.globalAlpha = gl.alpha * (0.6 + 0.4 * Math.sin(t + gl.seed));
-        const k = 0.7 + gl.depth * 0.5;
-        const { c, w, h } = gl.sprite;
-        ctx.drawImage(c, x - (w * k) / 2, yy - (h * k) / 2, w * k, h * k);
+        const x = m.x + Math.sin(t * 0.5 + m.seed) * 14 * m.depth;
+        // twinkle: mostly dim, now and then a bright glint
+        const tw = Math.pow(0.5 + 0.5 * Math.sin(t * (0.8 + m.depth) + m.seed * 7), 3);
+        ctx.globalAlpha = m.alpha * (0.25 + 0.75 * tw);
+        const k = m.size * (0.6 + m.depth * 0.6);
+        ctx.drawImage(mote, x - k / 2, yy - k / 2, k, k);
       }
       ctx.restore();
 
@@ -451,7 +450,7 @@ export default function Film() {
       if (bg) {
         const [sx, sy] = toScreen(250, 170);
         const k = (560 * s) / SIGIL_BASE;
-        const o = 0.1 + 0.22 * ignite * fade;
+        const o = (0.07 + 0.15 * ignite) * fade;
         setStyle(bg, "opacity", o < 0.005 ? "0" : o.toFixed(3));
         setStyle(bg, "visibility", o < 0.005 || k > 4 ? "hidden" : "visible");
         if (o >= 0.005 && k <= 4) {
@@ -467,11 +466,10 @@ export default function Film() {
         const size = Math.min(W, H) * (mobile ? 1.05 : 0.92);
         setStyle(portal, "opacity", open.toFixed(3));
         setStyle(portal, "visibility", open < 0.005 ? "hidden" : "visible");
+        portalLive.current = open >= 0.005;
         if (open >= 0.005) {
           setStyle(portal, "transform", `translate(-50%, -50%) scale(${((size / SIGIL_BASE) * (0.08 + 0.92 * open)).toFixed(4)})`);
-          setVar(portal, "--r1", `${(t * 8 + p * 200).toFixed(2)}deg`);
-          setVar(portal, "--r2", `${(-t * 12 - p * 300).toFixed(2)}deg`);
-          setVar(portal, "--r3", `${(t * 5).toFixed(2)}deg`);
+          setVar(portal, "--r1", `${(t * 6 + p * 160).toFixed(2)}deg`);
         }
       }
 
@@ -564,9 +562,20 @@ export default function Film() {
           className="pointer-events-none invisible absolute left-1/2 top-[42%] origin-center text-moon opacity-0 will-change-transform md:top-[44%]"
           style={{ width: SIGIL_BASE, height: SIGIL_BASE }}
         >
-          {/* A painted glow instead of a drop-shadow filter: no per-frame filter work. */}
-          <div className="absolute inset-[-6%] rounded-full bg-[radial-gradient(circle,rgba(143,211,255,0.22)_0%,rgba(143,211,255,0.08)_45%,transparent_70%)]" />
-          <Sigil id="portal-sigil" layered className="h-full w-full" />
+          <Aura activeRef={portalLive} className="absolute inset-[-12%] h-[124%] w-[124%]" />
+          {/* One fine ring of text, turning slowly */}
+          <div className="absolute inset-0 will-change-transform" style={{ transform: "rotate(var(--r1, 0deg))" }}>
+            <svg viewBox="0 0 400 400" className="h-full w-full" fill="none">
+              <defs>
+                <path id="portal-ring" d="M200,200 m-176,0 a176,176 0 1,1 352,0 a176,176 0 1,1 -352,0" />
+              </defs>
+              <text fill="rgba(234,246,255,0.55)" fontSize="7" letterSpacing="3.4" style={{ fontFamily: "var(--font-geist-mono)" }}>
+                <textPath href="#portal-ring">
+                  RYTHME NAGRANI · PROTOCOL ENGINEER · DEVELOPER RELATIONS · BASE · SOLANA · ROOTSTOCK · ZERO KNOWLEDGE · TOKEN2049 ·
+                </textPath>
+              </text>
+            </svg>
+          </div>
         </div>
 
         {/* Vignette and bottom fade keep the copy readable over the art. */}
@@ -589,7 +598,7 @@ export default function Film() {
           >
             {ch.lead && <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-moon [text-shadow:0_1px_12px_#04050a,0_0_2px_#04050a] md:text-xs">{ch.lead}</p>}
             {i === 0 ? (
-              <h1 className="mt-3 font-display text-[13vw] font-semibold leading-[0.95] tracking-[0.06em] text-white text-glow md:text-[6.5rem]">
+              <h1 className="mt-2 font-display text-[17vw] font-normal leading-[0.9] tracking-[-0.02em] text-white text-glow md:text-[9rem]">
                 <span className="sr-only">{ch.word}</span>
                 <span aria-hidden data-decipher={ch.word}>
                   {ch.word}
@@ -597,8 +606,8 @@ export default function Film() {
               </h1>
             ) : (
               <h2
-                className={`mt-3 font-display font-semibold leading-[0.95] tracking-[0.06em] text-white text-glow ${
-                  ch.word.length > 8 ? "text-[11vw] md:text-[5.5rem]" : "text-[22vw] md:text-[10rem]"
+                className={`aura-text mt-4 font-display font-normal italic leading-[0.88] tracking-[-0.03em] ${
+                  ch.word.length > 8 ? "text-[14vw] md:text-[8rem]" : "text-[30vw] md:text-[13rem]"
                 }`}
               >
                 <span className="sr-only">{ch.word}</span>
@@ -621,7 +630,7 @@ export default function Film() {
         ))}
 
         <div ref={hintRef} className="absolute inset-x-0 bottom-[3%] flex flex-col items-center gap-2 text-white/55" aria-hidden>
-          <span className="font-display text-[10px] uppercase tracking-[0.35em]">Scroll to cast</span>
+          <span className="font-mono text-[10px] uppercase tracking-[0.3em]">Scroll</span>
           <span className="h-8 w-px animate-pulse bg-gradient-to-b from-moon to-transparent" />
         </div>
 

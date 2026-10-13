@@ -30,7 +30,7 @@ function CaseStudyCard({ study, flip }: { study: CaseStudy; flip: boolean }) {
           </span>
         </div>
 
-        <h3 className="mt-4 font-display text-2xl font-bold text-white">{study.name}</h3>
+        <h3 className="mt-4 font-display text-4xl text-white">{study.name}</h3>
         <p className="mt-2 text-lg leading-snug text-white/90">{study.summary}</p>
         <p className="mt-3 text-[15px] leading-relaxed text-white/70">{study.detail}</p>
 
@@ -99,7 +99,7 @@ export default function WorkSection() {
           <div className="grid gap-6 lg:grid-cols-[1fr_1.1fr] lg:gap-10">
             <div>
               <span className="chip !text-moon">Rootstock · 2026</span>
-              <h3 className="mt-4 font-display text-2xl font-bold text-white">{rootstock.title}</h3>
+              <h3 className="mt-4 font-display text-4xl text-white">{rootstock.title}</h3>
               <p className="mt-3 text-[15px] leading-relaxed text-white/75">{rootstock.summary}</p>
             </div>
             <ul className="divide-y divide-white/10 self-center">

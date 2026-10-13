@@ -120,11 +120,11 @@ export default function WandCursor() {
 
   return (
     <>
-      <canvas ref={canvasRef} aria-hidden className="pointer-events-none fixed inset-0 z-[80] hidden h-full w-full [.wand_&]:block" />
+      <canvas ref={canvasRef} aria-hidden className="wand-layer pointer-events-none fixed inset-0 z-[80] hidden h-full w-full [.wand_&]:block" />
       <div
         ref={ringRef}
         aria-hidden
-        className="pointer-events-none fixed left-0 top-0 z-[81] hidden h-7 w-7 rounded-full border border-moon/80 will-change-transform [.wand_&]:block"
+        className="wand-layer pointer-events-none fixed left-0 top-0 z-[81] hidden h-7 w-7 rounded-full border border-moon/80 will-change-transform [.wand_&]:block"
         style={{ transform: "translate3d(-100px, -100px, 0)" }}
       >
         <span className="absolute left-1/2 top-1/2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow-[0_0_10px_3px_rgba(143,211,255,0.9)]" />

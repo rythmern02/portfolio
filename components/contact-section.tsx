@@ -68,7 +68,10 @@ export default function ContactSection() {
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            <SpellButton href={`mailto:${profile.email}`} icon="✉">
+            <SpellButton href="book" icon="✦">
+              Book a call
+            </SpellButton>
+            <SpellButton href={`mailto:${profile.email}`} variant="trace">
               Email me
             </SpellButton>
             <button type="button" onClick={copyEmail} className="btn-ghost" aria-live="polite">

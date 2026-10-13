@@ -1,15 +1,16 @@
 import type React from "react";
 import type { Metadata, Viewport } from "next";
-import { Cinzel } from "next/font/google";
+import { Instrument_Serif } from "next/font/google";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { profile, siteUrl } from "@/lib/content";
 import "lenis/dist/lenis.css";
 import "./globals.css";
 
-const cinzel = Cinzel({
+const serif = Instrument_Serif({
   subsets: ["latin"],
-  weight: ["500", "600", "700"],
+  weight: "400",
+  style: ["normal", "italic"],
   variable: "--font-display",
   display: "swap",
 });
@@ -49,7 +50,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`dark ${cinzel.variable} ${GeistSans.variable} ${GeistMono.variable}`}>
+    <html lang="en" className={`dark ${serif.variable} ${GeistSans.variable} ${GeistMono.variable}`}>
       <body className="font-sans">{children}</body>
     </html>
   );

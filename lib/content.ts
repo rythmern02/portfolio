@@ -338,34 +338,34 @@ export const film: FilmChapter[] = [
   {
     window: [0, 0.14],
     lead: "Protocol engineer · Developer relations",
-    word: "RYTHME NAGRANI",
+    word: "Rythme Nagrani",
     body: "Open to DevRel and protocol engineering roles · Singapore or remote",
   },
   {
     window: [0.18, 0.36],
     lead: "If you're shipping onchain, I",
-    word: "BUILD",
+    word: "build.",
     body: "Protocols on Base, Solana, Rootstock and Somnia: Certora-reviewed DeFi, zero-knowledge payroll and execution engines.",
   },
   {
     window: [0.39, 0.55],
     lead: "If you're growing a developer ecosystem, I",
-    word: "TEACH",
+    word: "teach.",
     body: "75+ developer events and 5,000+ developers reached. Bootcamps, hackathons and docs, and I write the code behind them.",
   },
   {
     window: [0.58, 0.72],
     lead: "When it counts, I",
-    word: "WIN",
+    word: "win.",
     body: "TOKEN2049 Origins Hackathon winner. $17K Compound grant. Author on the Rootstock Developer Portal.",
   },
   {
     window: [0.8, 1.01],
     lead: "The circle is open",
-    word: "SEE WHAT I'VE CAST",
+    word: "see what I've cast",
     ctas: [
-      { label: "Enter the grimoire", href: "#work" },
-      { label: "Say hello", href: "#contact" },
+      { label: "See the work", href: "#work" },
+      { label: "Book a call", href: "book" },
     ],
   },
 ];

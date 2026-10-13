@@ -48,11 +48,13 @@ export default function Nav() {
 
     const observer = new IntersectionObserver(
       (entries) => {
-        for (const entry of entries) if (entry.isIntersecting) setActive(`#${entry.target.id}`);
+        // The closing booking section belongs to Contact.
+        for (const entry of entries)
+          if (entry.isIntersecting) setActive(entry.target.id === "book" ? "#contact" : `#${entry.target.id}`);
       },
       { rootMargin: "-30% 0px -65% 0px" },
     );
-    for (const id of ["#top", ...nav.map((n) => n.href)]) {
+    for (const id of ["#top", ...nav.map((n) => n.href), "#book"]) {
       const el = document.querySelector(id);
       if (el) observer.observe(el);
     }
@@ -81,11 +83,15 @@ export default function Nav() {
 
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4 md:px-8 md:pt-5">
+      <header
+        className={`fixed inset-x-0 top-0 z-50 px-4 pb-3 pt-4 transition-colors duration-500 md:px-8 md:pt-5 lg:bg-transparent ${
+          scrolled && !open ? "bg-ink/85 lg:pb-0" : "bg-transparent"
+        }`}
+      >
         <nav aria-label="Main" className="mx-auto flex max-w-[84rem] items-center justify-between gap-4">
           <a href="#top" className="group flex items-center gap-2.5" onClick={() => setOpen(false)}>
             <Sigil id="nav-sigil" className="h-9 w-9 animate-spin-slow text-moon transition duration-500 group-hover:text-white" />
-            <span className="font-display text-[15px] font-semibold tracking-[0.24em] text-white">RYTHME</span>
+            <span className="font-display text-[24px] italic leading-none text-white">Rythme</span>
           </a>
 
           <div
@@ -164,7 +170,7 @@ export default function Nav() {
                 <span aria-hidden className={`text-sm ${active === item.href ? "text-moon" : "text-white/20"}`}>
                   ☾
                 </span>
-                <span className={`font-display text-4xl font-semibold tracking-[0.08em] ${active === item.href ? "text-moon" : "text-white"}`}>
+                <span className={`font-display text-5xl tracking-[-0.01em] ${active === item.href ? "text-moon" : "text-white"}`}>
                   {item.label}
                 </span>
               </a>

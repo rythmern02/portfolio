@@ -90,7 +90,9 @@ export default function Loader({ onComplete }: { onComplete: () => void }) {
           <Sigil id="loader-sigil" draw className="h-full w-full animate-spin-slow drop-shadow-[0_0_18px_rgba(143,211,255,0.6)]" />
         </div>
 
-        <p className="mt-10 font-display text-2xl font-semibold tracking-[0.2em] text-white">RYTHME NAGRANI</p>
+        <p className="mt-10 font-display text-4xl text-white">
+          Rythme <span className="aura-text italic">Nagrani</span>
+        </p>
         <p className="mt-3 px-6 font-mono text-[11px] uppercase tracking-[0.2em] text-white/60">
           Drawing the summoning circle · {Math.round(progress)}%
         </p>

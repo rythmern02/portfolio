@@ -18,7 +18,7 @@ export default function CommunitySection() {
           {stats.map((s) => (
             <div key={s.label} className="bg-panel px-5 py-6">
               <dt className="text-sm text-white/65">{s.label}</dt>
-              <dd className="mt-1 font-display text-3xl font-bold text-white md:text-4xl">{s.value}</dd>
+              <dd className="mt-1 font-display text-5xl text-white md:text-6xl">{s.value}</dd>
             </div>
           ))}
         </dl>
