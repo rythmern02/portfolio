@@ -14,7 +14,7 @@ import ExperienceSection from "@/components/experience-section"
 import ContactSection from "@/components/contact-section"
 import BookSection from "@/components/book-section"
 import BookingModal from "@/components/booking"
-import { labs, profile } from "@/lib/content"
+import SiteFooter from "@/components/site-footer"
 
 export default function Home() {
   const [ready, setReady] = useState(false)
@@ -81,24 +81,7 @@ export default function Home() {
         <ContactSection />
         <BookSection />
 
-        <footer className="border-t border-white/10 px-5 py-10 md:px-6">
-          <div className="mx-auto flex max-w-content flex-col gap-3 text-sm text-white/55 md:flex-row md:items-center md:justify-between">
-            <p>
-              © {new Date().getFullYear()} {profile.name}. One portrait, everything else is code.
-            </p>
-            <p className="flex gap-5">
-              <a href={labs.home} target="_blank" rel="noopener" className="hover:text-white">
-                Web3Spell Labs
-              </a>
-              <a href={profile.resume} target="_blank" rel="noopener" className="hover:text-white">
-                Resume
-              </a>
-              <a href="#top" className="hover:text-white">
-                Back to the circle ↑
-              </a>
-            </p>
-          </div>
-        </footer>
+        <SiteFooter />
       </div>
     </main>
   )

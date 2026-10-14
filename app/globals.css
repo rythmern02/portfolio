@@ -791,3 +791,28 @@ dialog.booking[open] .booking-panel {
     filter: none;
   }
 }
+
+/* Footer wordmark ---------------------------------------------------------- */
+.footer-mark {
+  container-type: inline-size;
+}
+.footer-word {
+  /* "rythme.world" in Bricolage Bold at this tracking is 5.85em wide, so this
+     runs it edge to edge of the container on any screen. */
+  font-size: calc(100cqw / 5.95);
+  padding-bottom: 0.02em;
+  background:
+    radial-gradient(28vw circle at var(--mx, 50%) var(--my, 40%), rgba(255, 255, 255, 0.55), transparent 60%),
+    linear-gradient(180deg, #cfe6ff 0%, #8db8ff 30%, #2f6bff 58%, rgba(11, 22, 48, 0) 92%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  /* The bottom of the letters sinks into the page edge, like the reference. */
+  margin-bottom: -0.16em;
+}
+.footer-dot {
+  color: transparent;
+  background: linear-gradient(180deg, #ffffff, #5aa9ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+}

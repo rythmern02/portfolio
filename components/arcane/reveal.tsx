@@ -29,7 +29,7 @@ export default function RevealObserver() {
       if (e.pointerType !== "mouse") return;
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
-        const card = (e.target as Element | null)?.closest?.<HTMLElement>(".card");
+        const card = (e.target as Element | null)?.closest?.<HTMLElement>(".card, .spot");
         if (!card) return;
         const r = card.getBoundingClientRect();
         card.style.setProperty("--mx", `${(e.clientX - r.left).toFixed(0)}px`);
