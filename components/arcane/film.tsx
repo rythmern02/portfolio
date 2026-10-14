@@ -230,11 +230,132 @@ function haloSprite() {
 }
 
 type Flame = { x: number; y: number; vx: number; vy: number; life: number; max: number; size: number; seed: number };
+// A four-point star glint: two long, thin soft beams crossed over a core.
+function starSprite() {
+  const n = 128;
+  const c = makeCanvas(n, n);
+  const g = c.getContext("2d")!;
+  g.translate(n / 2, n / 2);
+  g.globalCompositeOperation = "lighter";
+  for (const [rot, sx, sy] of [
+    [0, 1, 0.045],
+    [Math.PI / 2, 1, 0.045],
+    [Math.PI / 4, 0.42, 0.03],
+    [-Math.PI / 4, 0.42, 0.03],
+  ] as const) {
+    g.save();
+    g.rotate(rot);
+    g.scale(sx, sy);
+    const grad = g.createRadialGradient(0, 0, 0, 0, 0, n / 2);
+    grad.addColorStop(0, "rgba(255,255,255,1)");
+    grad.addColorStop(0.25, "rgba(207,230,255,0.8)");
+    grad.addColorStop(1, "rgba(90,169,255,0)");
+    g.fillStyle = grad;
+    g.beginPath();
+    g.arc(0, 0, n / 2, 0, Math.PI * 2);
+    g.fill();
+    g.restore();
+  }
+  const core = g.createRadialGradient(0, 0, 0, 0, 0, n * 0.14);
+  core.addColorStop(0, "rgba(255,255,255,1)");
+  core.addColorStop(1, "rgba(207,230,255,0)");
+  g.fillStyle = core;
+  g.beginPath();
+  g.arc(0, 0, n * 0.14, 0, Math.PI * 2);
+  g.fill();
+  return c;
+}
+
+// The inside of his eye, drawn once: a dark pupil, fibres radiating out
+// through a bright collarette, little crypts, and a dark limbal ring.
+function irisSprite() {
+  const n = 1024;
+  const R = n / 2;
+  const c = makeCanvas(n, n);
+  const g = c.getContext("2d")!;
+  g.translate(R, R);
+  const base = g.createRadialGradient(0, 0, R * 0.2, 0, 0, R);
+  base.addColorStop(0, "rgba(2,4,12,1)");
+  base.addColorStop(0.3, "rgba(4,10,30,1)");
+  base.addColorStop(0.42, "rgba(22,64,170,0.95)");
+  base.addColorStop(0.7, "rgba(18,52,140,0.85)");
+  base.addColorStop(0.92, "rgba(8,22,64,0.9)");
+  base.addColorStop(1, "rgba(4,6,12,0)");
+  g.fillStyle = base;
+  g.beginPath();
+  g.arc(0, 0, R, 0, Math.PI * 2);
+  g.fill();
+  // fibres
+  let seed = 7;
+  const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  g.lineCap = "round";
+  for (let k = 0; k < 1400; k++) {
+    const a = rnd() * Math.PI * 2;
+    const r0 = R * (0.3 + rnd() * 0.08);
+    const r1 = R * (0.55 + rnd() * 0.38);
+    const bend = (rnd() - 0.5) * 0.18;
+    const bright = rnd();
+    g.strokeStyle = bright > 0.85 ? `rgba(207,230,255,${0.12 + rnd() * 0.22})` : `rgba(90,169,255,${0.05 + rnd() * 0.14})`;
+    g.lineWidth = 0.6 + rnd() * 1.8;
+    g.beginPath();
+    g.moveTo(Math.cos(a) * r0, Math.sin(a) * r0);
+    const am = a + bend;
+    const rm = (r0 + r1) / 2;
+    g.quadraticCurveTo(Math.cos(am) * rm, Math.sin(am) * rm, Math.cos(a + bend * 0.6) * r1, Math.sin(a + bend * 0.6) * r1);
+    g.stroke();
+  }
+  // collarette: a bright, wavy ring around the pupil
+  g.strokeStyle = "rgba(207,230,255,0.35)";
+  g.lineWidth = 2.2;
+  g.beginPath();
+  for (let k = 0; k <= 180; k++) {
+    const a = (k / 180) * Math.PI * 2;
+    const r = R * (0.44 + Math.sin(a * 9) * 0.012 + Math.sin(a * 23) * 0.006);
+    if (k) g.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+    else g.moveTo(Math.cos(a) * r, Math.sin(a) * r);
+  }
+  g.stroke();
+  // crypts
+  for (let k = 0; k < 46; k++) {
+    const a = rnd() * Math.PI * 2;
+    const r = R * (0.48 + rnd() * 0.36);
+    g.fillStyle = `rgba(2,6,20,${0.25 + rnd() * 0.3})`;
+    g.save();
+    g.translate(Math.cos(a) * r, Math.sin(a) * r);
+    g.rotate(a);
+    g.beginPath();
+    g.ellipse(0, 0, R * (0.02 + rnd() * 0.03), R * (0.006 + rnd() * 0.01), 0, 0, Math.PI * 2);
+    g.fill();
+    g.restore();
+  }
+  // limbal ring
+  g.strokeStyle = "rgba(2,4,12,0.85)";
+  g.lineWidth = R * 0.05;
+  g.beginPath();
+  g.arc(0, 0, R * 0.9, 0, Math.PI * 2);
+  g.stroke();
+  return c;
+}
+
+type Spark = { x: number; y: number; vx: number; vy: number; life: number; max: number; size: number; rot: number; spin: number };
+type Streak = { x: number; y: number; vx: number; vy: number; life: number };
+type Star = { a: number; r: number; w: number; size: number; seed: number };
+
 type Mote = { x: number; y: number; size: number; alpha: number; depth: number; seed: number };
 
 // The big circles are laid out once at this size and only ever moved with
 // GPU transforms, so they never re-render while animating.
 const SIGIL_BASE = 1000;
+// Star glints that twinkle over the finale headline: left, top, delay, size.
+const GLINTS: [string, string, string, string][] = [
+  ["3%", "18%", "0s", "1"],
+  ["27%", "-6%", "1.1s", "0.7"],
+  ["49%", "8%", "2.3s", "1.15"],
+  ["64%", "-10%", "0.6s", "0.8"],
+  ["82%", "22%", "1.7s", "1"],
+  ["97%", "58%", "2.9s", "0.65"],
+];
+
 // How long the finale holds before gliding into the work (ms).
 const GLIDE_WAIT = 1400;
 
@@ -318,6 +439,21 @@ export default function Film() {
     const halo = haloSprite();
     const shaft = shaftSprite();
     const dust = dustSprite();
+    const star = starSprite();
+    const iris = irisSprite();
+    const sparks: Spark[] = [];
+    const streaks: Streak[] = [];
+    let emit = 0;
+    let warpEmit = 0;
+    const eyePts: [number, number][] = [];
+    // Stardust that slowly circles inside the eye at the finale.
+    const stardust: Star[] = Array.from({ length: mobile ? 36 : 64 }, (_, k) => ({
+      a: (k / 64) * Math.PI * 2 + Math.random(),
+      r: 0.32 + Math.random() * 0.5,
+      w: (Math.random() < 0.5 ? -1 : 1) * (0.04 + Math.random() * 0.1),
+      size: 4 + Math.random() * 12,
+      seed: Math.random() * 100,
+    }));
 
     const flames: Flame[] = [];
     const flameCount = mobile ? 12 : 22;
@@ -474,58 +610,42 @@ export default function Film() {
           ctx.restore();
         }
 
-        // Eyes: glow, a rotating moon sigil in each iris, and a lens streak.
+        // Eyes: a radiant iris glow and a slowly turning star glint on each
+        // catchlight. Sparks drift out of them (drawn below, in screen space).
+        eyePts.length = 0;
         if (eyes > 0) {
           for (const [i, [ex, ey]] of EYES.entries()) {
             const [x, y] = toScreen(ex, ey);
+            eyePts.push([x, y]);
             const r = 4.4 * s;
-            const g = ctx.createRadialGradient(x, y, 0, x, y, r * 4);
-            g.addColorStop(0, `rgba(200,240,255,${0.95 * eyes})`);
-            g.addColorStop(0.25, `rgba(143,211,255,${0.6 * eyes})`);
-            g.addColorStop(1, "rgba(43,108,176,0)");
+            const pulse = reduced ? 1 : 0.85 + 0.15 * Math.sin(t * 2.6 + i * 1.7);
+            const g = ctx.createRadialGradient(x, y, 0, x, y, r * 5);
+            g.addColorStop(0, `rgba(235,246,255,${0.95 * eyes})`);
+            g.addColorStop(0.18, `rgba(160,205,255,${0.7 * eyes})`);
+            g.addColorStop(0.5, `rgba(47,107,255,${0.22 * eyes})`);
+            g.addColorStop(1, "rgba(11,22,48,0)");
+            ctx.globalCompositeOperation = "lighter";
             ctx.globalAlpha = fade;
             ctx.fillStyle = g;
             ctx.beginPath();
-            ctx.arc(x, y, r * 4, 0, Math.PI * 2);
+            ctx.arc(x, y, r * 5, 0, Math.PI * 2);
             ctx.fill();
-
-            ctx.save();
-            ctx.translate(x, y);
-            ctx.rotate(t * (i ? -1.2 : 1.2));
-            ctx.strokeStyle = `rgba(225,246,255,${0.8 * eyes})`;
-            ctx.fillStyle = `rgba(225,246,255,${0.85 * eyes})`;
-            ctx.lineWidth = Math.max(0.5, r * 0.05);
-            ctx.beginPath();
-            ctx.arc(0, 0, r * 0.9, 0, Math.PI * 2);
-            ctx.stroke();
-            for (let k = 0; k < 3; k++) {
-              const a = (k / 3) * Math.PI * 2;
-              ctx.beginPath();
-              ctx.arc(Math.cos(a) * r * 0.9, Math.sin(a) * r * 0.9, r * 0.11, 0, Math.PI * 2);
-              ctx.fill();
+            // star glints: one large and slow, one small and counter-turning
+            const gx = x - r * 0.28;
+            const gy = y - r * 0.32;
+            for (const [scale, speed, alpha] of [
+              [9, 0.25, 0.95],
+              [4.2, -0.6, 0.7],
+            ] as const) {
+              const size = r * scale * pulse * eyes;
+              ctx.save();
+              ctx.translate(gx, gy);
+              ctx.rotate(t * speed + i * 0.8);
+              ctx.globalAlpha = fade * alpha * eyes;
+              ctx.drawImage(star, -size / 2, -size / 2, size, size);
+              ctx.restore();
             }
-            // crescent
-            ctx.beginPath();
-            ctx.arc(0, 0, r * 0.34, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.globalCompositeOperation = "destination-out";
-            ctx.beginPath();
-            ctx.arc(r * 0.15, -r * 0.08, r * 0.29, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.restore();
-            ctx.globalCompositeOperation = "lighter";
           }
-          const [x1, y1] = toScreen(EYES[0][0], EYES[0][1]);
-          const [x2, y2] = toScreen(EYES[1][0], EYES[1][1]);
-          const my = (y1 + y2) / 2;
-          const streak = ctx.createLinearGradient(0, 0, W, 0);
-          streak.addColorStop(0, "rgba(143,211,255,0)");
-          streak.addColorStop(clamp(x1 / W), `rgba(170,225,255,${0.5 * eyes})`);
-          streak.addColorStop(clamp(x2 / W), `rgba(170,225,255,${0.5 * eyes})`);
-          streak.addColorStop(1, "rgba(143,211,255,0)");
-          ctx.globalAlpha = fade;
-          ctx.fillStyle = streak;
-          ctx.fillRect(0, my - 1, W, 2);
         }
         ctx.restore();
       }
@@ -539,6 +659,117 @@ export default function Film() {
         g.addColorStop(1, "rgba(4,5,10,0)");
         ctx.fillStyle = g;
         ctx.fillRect(0, 0, W, H);
+      }
+
+      // ---- sparks from the eyes ------------------------------------------
+      ctx.save();
+      ctx.globalCompositeOperation = "lighter";
+      if (!reduced && eyePts.length && eyes > 0.05 && fade > 0.05) {
+        emit += dt * 46 * eyes;
+        while (emit > 1 && sparks.length < 180) {
+          emit--;
+          const [ex, ey] = eyePts[(Math.random() * eyePts.length) | 0];
+          const a = Math.random() * Math.PI * 2;
+          const sp = 18 + Math.random() * 60;
+          sparks.push({
+            x: ex + Math.cos(a) * 4,
+            y: ey + Math.sin(a) * 4,
+            vx: Math.cos(a) * sp,
+            vy: Math.sin(a) * sp - 14,
+            life: 0,
+            max: 0.7 + Math.random() * 1.3,
+            size: 5 + Math.random() * 14,
+            rot: Math.random() * Math.PI,
+            spin: (Math.random() - 0.5) * 3,
+          });
+        }
+      }
+      for (let k = sparks.length - 1; k >= 0; k--) {
+        const sp = sparks[k];
+        sp.life += dt;
+        if (sp.life > sp.max) {
+          sparks.splice(k, 1);
+          continue;
+        }
+        sp.x += sp.vx * dt;
+        sp.y += sp.vy * dt;
+        sp.vx *= 0.985;
+        sp.vy *= 0.985;
+        sp.rot += sp.spin * dt;
+        const q = sp.life / sp.max;
+        const tw = 0.6 + 0.4 * Math.sin(sp.life * 18 + sp.rot * 3);
+        const size = sp.size * Math.sin(Math.PI * q);
+        ctx.globalAlpha = tw * (1 - q * 0.3);
+        ctx.save();
+        ctx.translate(sp.x, sp.y);
+        ctx.rotate(sp.rot);
+        ctx.drawImage(star, -size / 2, -size / 2, size, size);
+        ctx.restore();
+      }
+
+      // ---- the dive: a tunnel of light rushing past ----------------------
+      const tunnel = range(p, 0.69, 0.75) * (1 - range(p, 0.79, 0.86));
+      if (!reduced && tunnel > 0.01) {
+        warpEmit += dt * 520 * tunnel;
+        while (warpEmit > 1 && streaks.length < 260) {
+          warpEmit--;
+          const a = Math.random() * Math.PI * 2;
+          const r0 = 4 + Math.random() * 40;
+          const sp = 120 + Math.random() * 280;
+          streaks.push({ x: ax + Math.cos(a) * r0, y: ay + Math.sin(a) * r0, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, life: 0 });
+        }
+      }
+      ctx.lineCap = "round";
+      for (let k = streaks.length - 1; k >= 0; k--) {
+        const st = streaks[k];
+        st.life += dt;
+        const boost = 1 + 4 * dt;
+        st.vx *= boost;
+        st.vy *= boost;
+        st.x += st.vx * dt;
+        st.y += st.vy * dt;
+        if (st.life > 1.4 || st.x < -60 || st.x > W + 60 || st.y < -60 || st.y > H + 60) {
+          streaks.splice(k, 1);
+          continue;
+        }
+        const len = 0.045;
+        ctx.globalAlpha = Math.min(1, st.life * 3) * 0.75;
+        ctx.strokeStyle = st.life < 0.3 ? "#ffffff" : "#cfe6ff";
+        ctx.lineWidth = 1 + st.life * 1.6;
+        ctx.beginPath();
+        ctx.moveTo(st.x - st.vx * len, st.y - st.vy * len);
+        ctx.lineTo(st.x, st.y);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // ---- inside the eye: the iris around the seal, and stardust --------
+      const inside = range(p, 0.74, 0.86);
+      if (inside > 0.005) {
+        const portalSize = Math.min(W, H) * (mobile ? 0.8 : 0.52);
+        const cx = W / 2;
+        const cy = H * (mobile ? 0.34 : 0.35);
+        const S = portalSize * (0.08 + 0.92 * inside);
+        const R = S * 0.7;
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(reduced ? 0 : t * 0.02);
+        ctx.globalAlpha = inside * 0.95;
+        ctx.drawImage(iris, -R, -R, R * 2, R * 2);
+        ctx.restore();
+        ctx.save();
+        ctx.globalCompositeOperation = "lighter";
+        for (const d of stardust) {
+          const a = d.a + (reduced ? 0 : t * d.w);
+          const rr = d.r * S * 0.95;
+          const x = cx + Math.cos(a) * rr;
+          const y = cy + Math.sin(a) * rr * 0.96;
+          const tw = reduced ? 0.7 : 0.4 + 0.6 * Math.max(0, Math.sin(t * 1.6 + d.seed));
+          const size = d.size * tw;
+          ctx.globalAlpha = inside * tw * 0.8;
+          ctx.drawImage(star, x - size / 2, y - size / 2, size, size);
+        }
+        ctx.restore();
       }
 
       // ---- dust in the light --------------------------------------------
@@ -777,11 +1008,23 @@ export default function Film() {
               </h1>
             ) : (
               <h2
-                className={`scrub mt-1 font-display font-bold leading-[0.85] tracking-[-0.06em] ${
+                className={`scrub relative mt-1 font-display font-bold leading-[0.85] tracking-[-0.06em] ${
                   ch.word.length > 8 ? "text-[11.5vw] md:text-[6rem]" : "text-[26vw] md:text-[13rem]"
-                }`}
+                } ${i === film.length - 1 ? "cast" : ""}`}
               >
-                <Letters text={ch.word} />
+                {i === film.length - 1 ? (
+                  // Glints are placed against the words themselves, not the full-width heading.
+                  <span className="relative inline-block">
+                    <Letters text={ch.word} />
+                    <span aria-hidden className="glints">
+                      {GLINTS.map((g, k) => (
+                        <i key={k} style={{ left: g[0], top: g[1], animationDelay: g[2], "--gs": g[3] } as React.CSSProperties} />
+                      ))}
+                    </span>
+                  </span>
+                ) : (
+                  <Letters text={ch.word} />
+                )}
               </h2>
             )}
             {ch.body && (
