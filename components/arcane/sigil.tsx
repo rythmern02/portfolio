@@ -1,6 +1,14 @@
 import type React from "react";
 
-// The wizard's magic circle. Rings rotate independently through CSS variables
+// The wizard's magic circle, built from real sources rather than invented
+// glyphs: the Seal of Solomon (hexagram) around the Kamea of Jupiter, the 4x4
+// magic square Agrippa gives in "Three Books of Occult Philosophy" (1531,
+// book II ch. 22) for gain, favour and peace. Every row, column and diagonal
+// sums to 34; the whole square to 136. The rune ring carries the Hebrew names
+// Agrippa ties to those numbers. A sigil line is traced through the square
+// from 1 to 16, the classic way sigils were drawn from these tables.
+//
+// Rings rotate independently through CSS variables
 // (--r1 outer text ring, --r2 rune ring, --r3 hexagram) so callers can drive
 // them from scroll, time or nothing at all.
 //
@@ -8,7 +16,22 @@ import type React from "react";
 // rotating or scaling it is a GPU transform instead of re-rendering the SVG.
 // Use it for anything large that moves every frame.
 
-const RUNES = "ᚱᚤᛏᚺᛗᛖ ᚾᚨᚷᚱᚨᚾᛁ ᛟᚾᚲᚺᚨᛁᚾ".replace(/ /g, "").split("");
+// Kamea of Jupiter, as printed by Agrippa.
+const KAMEA = [
+  [4, 14, 15, 1],
+  [9, 7, 6, 12],
+  [5, 11, 10, 8],
+  [16, 2, 3, 13],
+];
+// Hebrew names Agrippa attaches to Jupiter's numbers (gematria in brackets):
+// Aba [4, the side], El Ab [34, each line], Iophiel the intelligence and
+// Hismael the spirit [136 each, the whole square].
+const NAMES = [
+  { he: "אבא", n: "4" },
+  { he: "אל אב", n: "34" },
+  { he: "יהפיאל", n: "136" },
+  { he: "הסמאל", n: "136" },
+];
 const RING_TEXT =
   "PROTOCOL ENGINEER ✦ DEVELOPER RELATIONS ✦ SOLIDITY ✦ RUST ✦ ANCHOR ✦ ZERO KNOWLEDGE ✦ BASE ✦ SOLANA ✦ ROOTSTOCK ✦ ";
 
@@ -44,23 +67,19 @@ function RuneRing({ drawCls }: { drawCls: string }) {
   return (
     <>
       <circle className={drawCls} cx="200" cy="200" r="148" stroke={stroke} strokeWidth="1" pathLength={1} />
-      {RUNES.map((r, i) => {
-        const a = (i / RUNES.length) * Math.PI * 2 - Math.PI / 2;
-        const x = r2(200 + 134 * Math.cos(a));
-        const y = r2(200 + 134 * Math.sin(a));
+      {NAMES.map((name, i) => {
+        const deg = i * 90;
         return (
-          <text
-            key={i}
-            x={x}
-            y={y}
-            fill={stroke}
-            fontSize="13"
-            textAnchor="middle"
-            dominantBaseline="central"
-            transform={`rotate(${r2((a * 180) / Math.PI + 90)} ${x} ${y})`}
-          >
-            {r}
-          </text>
+          <g key={name.he} transform={`rotate(${deg} 200 200)`}>
+            <text x="200" y="64" fill={stroke} fontSize="14" textAnchor="middle" dominantBaseline="central" direction="rtl">
+              {name.he}
+            </text>
+            <text x="200" y="76" fill={stroke} fontSize="6" textAnchor="middle" opacity="0.6" style={{ fontFamily: "var(--font-mono)" }}>
+              {name.n}
+            </text>
+            {/* small diamonds between the names */}
+            <path d="M200 60 l2.5 6 -2.5 6 -2.5 -6z" transform="rotate(45 200 200)" fill={stroke} opacity="0.6" />
+          </g>
         );
       })}
       <circle cx="200" cy="200" r="120" stroke={stroke} strokeWidth="0.6" strokeOpacity="0.7" />
@@ -82,18 +101,58 @@ function Hexagram({ drawCls }: { drawCls: string }) {
   );
 }
 
-function Core({ id, drawCls }: { id: string; drawCls: string }) {
+// The Kamea of Jupiter with a sigil traced through it, 1 to 16.
+const CELL = 19;
+const ORIGIN = 200 - CELL * 2;
+function cellCenter(n: number) {
+  for (let r = 0; r < 4; r++)
+    for (let c = 0; c < 4; c++) if (KAMEA[r][c] === n) return [ORIGIN + c * CELL + CELL / 2, ORIGIN + r * CELL + CELL / 2];
+  return [200, 200];
+}
+const TRACE = Array.from({ length: 16 }, (_, i) => cellCenter(i + 1));
+const TRACE_D = "M" + TRACE.map(([x, y]) => `${x} ${y}`).join(" L");
+const [START, END] = [TRACE[0], TRACE[15]];
+
+function Core({ drawCls }: { id: string; drawCls: string }) {
   return (
     <>
-      <defs>
-        <mask id={`${id}-moon`}>
-          <rect width="400" height="400" fill="white" />
-          <circle cx="216" cy="190" r="34" fill="black" />
-        </mask>
-      </defs>
       <circle className={drawCls} cx="200" cy="200" r="58" stroke={stroke} strokeWidth="1" pathLength={1} />
-      <circle cx="200" cy="200" r="40" fill={stroke} mask={`url(#${id}-moon)`} opacity="0.95" />
-      <path d="M248 158 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3z" fill={stroke} />
+      <rect x={ORIGIN} y={ORIGIN} width={CELL * 4} height={CELL * 4} stroke={stroke} strokeWidth="0.8" strokeOpacity="0.8" />
+      {[1, 2, 3].map((k) => (
+        <g key={k} stroke={stroke} strokeWidth="0.4" strokeOpacity="0.45">
+          <line x1={ORIGIN + k * CELL} y1={ORIGIN} x2={ORIGIN + k * CELL} y2={ORIGIN + CELL * 4} />
+          <line x1={ORIGIN} y1={ORIGIN + k * CELL} x2={ORIGIN + CELL * 4} y2={ORIGIN + k * CELL} />
+        </g>
+      ))}
+      {KAMEA.map((row, r) =>
+        row.map((n, c) => (
+          <text
+            key={n}
+            x={ORIGIN + c * CELL + CELL / 2}
+            y={ORIGIN + r * CELL + CELL / 2}
+            fill={stroke}
+            fontSize="6.5"
+            textAnchor="middle"
+            dominantBaseline="central"
+            opacity="0.5"
+            style={{ fontFamily: "var(--font-mono)" }}
+          >
+            {n}
+          </text>
+        )),
+      )}
+      {/* the sigil: a ring where it begins, a bar where it ends */}
+      <path
+        className={`kamea-trace ${drawCls}`}
+        d={TRACE_D}
+        stroke={stroke}
+        strokeWidth="1.1"
+        strokeLinejoin="round"
+        strokeLinecap="round"
+        pathLength={1}
+      />
+      <circle cx={START[0]} cy={START[1]} r="3" stroke={stroke} strokeWidth="1.2" fill="none" />
+      <line x1={END[0] - 4} y1={END[1] + 4} x2={END[0] + 4} y2={END[1] - 4} stroke={stroke} strokeWidth="1.4" strokeLinecap="round" />
     </>
   );
 }

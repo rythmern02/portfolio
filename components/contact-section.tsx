@@ -4,6 +4,8 @@ import { useState } from "react";
 import { ArrowUpRight, Check, Copy, Loader2 } from "lucide-react";
 import { profile } from "@/lib/content";
 import SpellButton from "./arcane/spell-button";
+import Rise from "./arcane/rise";
+import { BookButton } from "./booking";
 
 const field =
   "w-full rounded-xl border border-white/15 bg-black/40 px-4 py-3 text-[15px] text-white placeholder:text-white/40 transition-colors focus:border-moon focus:outline-none";
@@ -50,17 +52,10 @@ export default function ContactSection() {
       <div className="mx-auto grid max-w-content gap-12 lg:grid-cols-2 lg:gap-16">
         <div data-reveal>
           <p className="eyebrow">
-            <span className="text-white/35">V</span>
-            <span aria-hidden className="mx-2 text-gold/60">
-              ✦
-            </span>
-            Contact
+            <span className="text-azure">(05)</span> contact
           </p>
           <h2 className="section-title mt-4">
-            <span className="sr-only">{"Hiring? Let's talk."}</span>
-            <span aria-hidden data-decipher="Hiring? Let's talk.">
-              {"Hiring? Let's talk."}
-            </span>
+            <Rise text="Hiring? Let's talk." />
           </h2>
           <p className="mt-4 text-lg leading-relaxed text-white/75">
             I'm looking for a developer relations or protocol engineering role, in Singapore or remote. Collaborations
@@ -68,9 +63,7 @@ export default function ContactSection() {
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            <SpellButton href="book" icon="✦">
-              Book a call
-            </SpellButton>
+            <BookButton />
             <SpellButton href={`mailto:${profile.email}`} variant="trace">
               Email me
             </SpellButton>

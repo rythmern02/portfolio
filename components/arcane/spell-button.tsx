@@ -2,13 +2,10 @@
 
 import { useRef } from "react";
 import type React from "react";
-import { decipher } from "./decipher";
-import { CALENDLY_URL, openBooking } from "@/lib/booking";
 
-// The site's buttons. "cast" is a dark glass pill with a comet of moonlight
-// orbiting its border; "trace" is a quiet text link whose underline draws
-// itself in. On hover the label briefly scrambles into runes and resolves.
-// href="book" opens the Calendly modal (and links to Calendly without JS).
+// The site's buttons. "cast" is a dark pill with a turning chrome rim, a pool
+// of light that follows the cursor inside it, and a slight magnetic pull;
+// "trace" is a quiet text link whose underline draws itself in.
 
 type Props = {
   href: string;
@@ -20,46 +17,47 @@ type Props = {
 };
 
 export default function SpellButton({ href, children, variant = "cast", icon, className = "", onClick }: Props) {
-  const label = useRef<HTMLSpanElement>(null);
-  const book = href === "book";
-  if (book) href = CALENDLY_URL;
-  const external = href.startsWith("http") || href.endsWith(".pdf") || href.startsWith("mailto:");
-  const cast = () => {
-    if (label.current && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) decipher(label.current, 420);
+  const ref = useRef<HTMLAnchorElement>(null);
+  const external = href.startsWith("http") || href.endsWith(".pdf");
+
+  const onMove = (e: React.PointerEvent<HTMLAnchorElement>) => {
+    const el = ref.current;
+    if (!el || e.pointerType !== "mouse") return;
+    const r = el.getBoundingClientRect();
+    const x = e.clientX - r.left;
+    const y = e.clientY - r.top;
+    el.style.setProperty("--mx", `${x}px`);
+    el.style.setProperty("--my", `${y}px`);
+    if (variant === "cast") {
+      el.style.transform = `translate3d(${((x - r.width / 2) * 0.18).toFixed(1)}px, ${((y - r.height / 2) * 0.28).toFixed(1)}px, 0)`;
+    }
+  };
+  const onLeave = () => {
+    if (ref.current) ref.current.style.transform = "";
   };
 
   return (
     <a
+      ref={ref}
       href={href}
-      onMouseEnter={cast}
-      onFocus={cast}
-      onClick={(e) => {
-        if (book) {
-          e.preventDefault();
-          openBooking();
-        }
-        onClick?.(e);
-      }}
-      {...(external && !href.startsWith("mailto:") ? { target: "_blank", rel: "noopener" } : {})}
+      onPointerMove={onMove}
+      onPointerLeave={onLeave}
+      onClick={onClick}
+      {...(external ? { target: "_blank", rel: "noopener" } : {})}
       className={`${variant === "cast" ? "spell" : "spell-trace"} ${className}`}
     >
+      <span>{children}</span>
       {variant === "cast" && (
         <span aria-hidden className="spell-glyph">
-          {icon ?? "☾"}
+          {icon ?? "↗"}
         </span>
       )}
-      <span className="sr-only">{children}</span>
-      <span ref={label} aria-hidden data-decipher={children}>
-        {children}
-      </span>
       {variant === "trace" && (
         <>
           <span aria-hidden className="spell-arrow">
-            ⟶
+            ↗
           </span>
-          <svg aria-hidden className="spell-ink" viewBox="0 0 200 8" preserveAspectRatio="none">
-            <path d="M1 5 C 30 1, 50 8, 80 4 S 140 1, 170 5 S 195 4, 199 3" pathLength={1} />
-          </svg>
+          <span aria-hidden className="spell-ink" />
         </>
       )}
     </a>

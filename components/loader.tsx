@@ -83,18 +83,16 @@ export default function Loader({ onComplete }: { onComplete: () => void }) {
 
       <div className="relative flex flex-col items-center text-center">
         <div
-          className={`relative h-56 w-56 text-moon transition-transform duration-700 ease-in md:h-72 md:w-72 ${
+          className={`relative h-56 w-56 text-ice transition-transform duration-700 ease-in md:h-72 md:w-72 ${
             phase === "flare" ? "scale-[6]" : "scale-100"
           }`}
         >
-          <Sigil id="loader-sigil" draw className="h-full w-full animate-spin-slow drop-shadow-[0_0_18px_rgba(143,211,255,0.6)]" />
+          <Sigil id="loader-sigil" draw className="h-full w-full animate-spin-slow drop-shadow-[0_0_18px_rgba(47,107,255,0.7)]" />
         </div>
 
-        <p className="mt-10 font-display text-4xl text-white">
-          Rythme <span className="aura-text italic">Nagrani</span>
-        </p>
-        <p className="mt-3 px-6 font-mono text-[11px] uppercase tracking-[0.2em] text-white/60">
-          Drawing the summoning circle · {Math.round(progress)}%
+        <p className="mt-10 font-display text-4xl font-bold tracking-[-0.045em] text-white">Rythme Nagrani</p>
+        <p className="mt-3 px-6 font-mono text-[11px] tracking-[0.04em] text-white/55">
+          tracing the table of jupiter · {Math.round(progress)}%
         </p>
       </div>
 

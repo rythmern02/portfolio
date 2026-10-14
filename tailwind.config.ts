@@ -11,12 +11,15 @@ export default {
         display: ["var(--font-display)", "Georgia", "serif"],
       },
       colors: {
-        ink: "#04050a",
-        panel: "#0a0d16",
-        // The brass of the robe's zipper, used for numerals and ornaments.
-        gold: { DEFAULT: "#d9b56a", soft: "#ecd7a6" },
-        // Moonlight blue, taken from the glow on the wizard's robe.
-        moon: { DEFAULT: "#8fd3ff", soft: "#c6e8ff", deep: "#2b6cb0" },
+        ink: "#04060c",
+        panel: "#09101f",
+        // One family of blues, taken from the wizard's robe: deep navy to ice.
+        navy: "#0b1630",
+        volt: "#2f6bff",
+        azure: "#5aa9ff",
+        ice: { DEFAULT: "#cfe6ff", deep: "#9cc8ff" },
+        // Older names still used in a few places map onto the same blues.
+        moon: { DEFAULT: "#8fd3ff", soft: "#cfe6ff", deep: "#2b6cb0" },
       },
       maxWidth: { content: "72rem" },
       keyframes: {

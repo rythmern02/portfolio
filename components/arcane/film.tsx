@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import type React from "react";
 import { film } from "@/lib/content";
 import Sigil from "./sigil";
 import SpellButton from "./spell-button";
-import Aura from "./aura";
-import { decipher } from "./decipher";
+import { BookButton } from "../booking";
+import { booking } from "@/lib/content";
 
 // ---------------------------------------------------------------------------
 // The scroll film. One portrait, everything else is procedural:
@@ -13,8 +14,10 @@ import { decipher } from "./decipher";
 //   runes   the robe's glowing glyphs are masked out of the PNG at runtime and
 //           ignite from hem to hat as you scroll
 //   eyes    moon sigils light up in both irises
-//   fire    blue "moonfire" particles along the bottom edge
-//   motes   faint points of light drifting upward and twinkling
+//   light   a two-tone halo, light shafts from above and a rim light traced
+//           around the silhouette, like a studio portrait
+//   haze    slow stage fog drifting along the floor
+//   dust    a few motes floating in the light
 // Everything is drawn to one canvas; chapter text is plain DOM on top.
 // ---------------------------------------------------------------------------
 
@@ -103,18 +106,114 @@ function buildLayers(img: HTMLImageElement) {
   dctx.fillStyle = "rgba(2,4,12,0.72)";
   dctx.fillRect(0, 0, IMG, IMG);
 
-  return { runes, bloom, dark };
+  // Rim light: pixels on the silhouette's edge, softened, in two tints.
+  const alpha = data.data;
+  const edge = bctx.createImageData(IMG, IMG);
+  const R = 3;
+  for (let y = R; y < IMG - R; y++) {
+    for (let x = R; x < IMG - R; x++) {
+      const i = (y * IMG + x) * 4 + 3;
+      if (alpha[i] < 140) continue;
+      if (
+        alpha[i - R * 4] < 40 ||
+        alpha[i + R * 4] < 40 ||
+        alpha[i - R * IMG * 4] < 40 ||
+        alpha[i + R * IMG * 4] < 40
+      ) {
+        edge.data[i - 3] = 255;
+        edge.data[i - 2] = 255;
+        edge.data[i - 1] = 255;
+        edge.data[i] = 255;
+      }
+    }
+  }
+  const edgeC = makeCanvas(IMG, IMG);
+  edgeC.getContext("2d")!.putImageData(edge, 0, 0);
+  const tint = (color: string) => {
+    // A soft wash of backlight, not a traced outline: a real Gaussian blur
+    // where canvas filters exist, otherwise halve-and-double in small steps
+    // (one big jump leaves visible blocks along the edge).
+    const c = makeCanvas(IMG, IMG);
+    const g = c.getContext("2d")!;
+    // Safari has no canvas filter; the property is simply missing there.
+    const canFilter = typeof (g as unknown as { filter?: unknown }).filter === "string";
+    if (canFilter) {
+      g.filter = "blur(7px)";
+      g.drawImage(edgeC, 0, 0);
+      g.drawImage(edgeC, 0, 0);
+      g.filter = "none";
+    } else {
+      let src: HTMLCanvasElement = edgeC;
+      const steps: HTMLCanvasElement[] = [];
+      for (let size = IMG / 2; size >= IMG / 16; size /= 2) {
+        const d = makeCanvas(size, size);
+        const dx = d.getContext("2d")!;
+        dx.imageSmoothingQuality = "high";
+        dx.drawImage(src, 0, 0, size, size);
+        steps.push(d);
+        src = d;
+      }
+      for (let i = steps.length - 2; i >= 0; i--) {
+        const d = steps[i];
+        const dx = d.getContext("2d")!;
+        dx.clearRect(0, 0, d.width, d.height);
+        dx.imageSmoothingQuality = "high";
+        dx.drawImage(steps[i + 1], 0, 0, d.width, d.height);
+      }
+      g.imageSmoothingQuality = "high";
+      g.drawImage(steps[0], 0, 0, IMG, IMG);
+      g.drawImage(steps[0], 0, 0, IMG, IMG);
+    }
+    g.globalCompositeOperation = "source-in";
+    g.fillStyle = color;
+    g.fillRect(0, 0, IMG, IMG);
+    return c;
+  };
+
+  return { runes, bloom, dark, rimCool: tint("#5aa9ff"), rimIce: tint("#e3f1ff") };
 }
 
-function flameSprite() {
-  const s = 64;
+function hazeSprite() {
+  const s = 128;
   const c = makeCanvas(s, s);
   const g = c.getContext("2d")!;
   const grad = g.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
-  grad.addColorStop(0, "rgba(235,248,255,0.9)");
-  grad.addColorStop(0.25, "rgba(143,211,255,0.55)");
-  grad.addColorStop(0.6, "rgba(43,108,176,0.18)");
-  grad.addColorStop(1, "rgba(10,20,60,0)");
+  grad.addColorStop(0, "rgba(120,170,255,0.55)");
+  grad.addColorStop(0.5, "rgba(47,107,255,0.22)");
+  grad.addColorStop(1, "rgba(11,22,48,0)");
+  g.fillStyle = grad;
+  g.fillRect(0, 0, s, s);
+  return c;
+}
+
+function shaftSprite() {
+  const w = 128;
+  const h = 512;
+  const c = makeCanvas(w, h);
+  const g = c.getContext("2d")!;
+  const across = g.createLinearGradient(0, 0, w, 0);
+  across.addColorStop(0, "rgba(207,230,255,0)");
+  across.addColorStop(0.5, "rgba(207,230,255,1)");
+  across.addColorStop(1, "rgba(207,230,255,0)");
+  g.fillStyle = across;
+  g.fillRect(0, 0, w, h);
+  g.globalCompositeOperation = "destination-in";
+  const down = g.createLinearGradient(0, 0, 0, h);
+  down.addColorStop(0, "rgba(0,0,0,1)");
+  down.addColorStop(1, "rgba(0,0,0,0)");
+  g.fillStyle = down;
+  g.fillRect(0, 0, w, h);
+  return c;
+}
+
+function dustSprite() {
+  const s = 16;
+  const c = makeCanvas(s, s);
+  const g = c.getContext("2d")!;
+  const grad = g.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+  grad.addColorStop(0, "rgba(235,245,255,1)");
+  grad.addColorStop(0.35, "rgba(207,230,255,0.5)");
+  grad.addColorStop(1, "rgba(207,230,255,0)");
   g.fillStyle = grad;
   g.fillRect(0, 0, s, s);
   return c;
@@ -125,36 +224,16 @@ function haloSprite() {
   const c = makeCanvas(s, s);
   const g = c.getContext("2d")!;
   const grad = g.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
-  grad.addColorStop(0, "rgba(43,108,176,1)");
-  grad.addColorStop(1, "rgba(43,108,176,0)");
-  g.fillStyle = grad;
-  g.fillRect(0, 0, s, s);
-  return c;
-}
-
-function moteSprite() {
-  const s = 32;
-  const c = makeCanvas(s, s);
-  const g = c.getContext("2d")!;
-  const grad = g.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
-  grad.addColorStop(0, "rgba(240,250,255,1)");
-  grad.addColorStop(0.2, "rgba(198,232,255,0.8)");
-  grad.addColorStop(1, "rgba(143,211,255,0)");
+  grad.addColorStop(0, "rgba(47,107,255,1)");
+  grad.addColorStop(0.55, "rgba(30,70,180,0.35)");
+  grad.addColorStop(1, "rgba(11,22,48,0)");
   g.fillStyle = grad;
   g.fillRect(0, 0, s, s);
   return c;
 }
 
 type Flame = { x: number; y: number; vx: number; vy: number; life: number; max: number; size: number; seed: number };
-type Mote = {
-  x: number;
-  y: number;
-  size: number;
-  alpha: number;
-  speed: number;
-  depth: number;
-  seed: number;
-};
+type Mote = { x: number; y: number; size: number; alpha: number; depth: number; seed: number };
 
 // The big circles are laid out once at this size and only ever moved with
 // GPU transforms, so they never re-render while animating.
@@ -177,12 +256,42 @@ function setVar(el: HTMLElement, name: string, value: string) {
   el.style.setProperty(name, value);
 }
 
+// One span per letter; CSS staggers them off the chapter's --v. Letters are
+// grouped per word so a line can only wrap between words, never inside one.
+function Letters({ text }: { text: string }) {
+  const n = Array.from(text).length;
+  let i = 0;
+  return (
+    <>
+      <span className="sr-only">{text}</span>
+      <span aria-hidden style={{ "--n": n } as React.CSSProperties}>
+        {text.split(" ").map((word, w) => {
+          const letters = Array.from(word).map((c) => {
+            const idx = i++;
+            return (
+              <span key={idx} className="l" style={{ "--i": idx } as React.CSSProperties}>
+                {c}
+              </span>
+            );
+          });
+          i++; // the space counts toward the stagger
+          return (
+            <span key={w}>
+              {w > 0 && " "}
+              <span className="inline-block whitespace-nowrap">{letters}</span>
+            </span>
+          );
+        })}
+      </span>
+    </>
+  );
+}
+
 export default function Film() {
   const trackRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const bgSigilRef = useRef<HTMLDivElement>(null);
   const portalRef = useRef<HTMLDivElement>(null);
-  const portalLive = useRef(false);
   const chapterRefs = useRef<(HTMLDivElement | null)[]>([]);
   const hintRef = useRef<HTMLDivElement>(null);
 
@@ -205,13 +314,14 @@ export default function Film() {
       layers = buildLayers(img);
     };
     if (img.complete && img.naturalWidth) layers = buildLayers(img);
-    const sprite = flameSprite();
+    const sprite = hazeSprite();
     const halo = haloSprite();
+    const shaft = shaftSprite();
+    const dust = dustSprite();
 
     const flames: Flame[] = [];
-    const flameCount = mobile ? 60 : 110;
+    const flameCount = mobile ? 12 : 22;
     const motes: Mote[] = [];
-    const mote = moteSprite();
 
     const resize = () => {
       // The portrait is 500px, so rendering past 1.5x buys no detail, only cost.
@@ -223,14 +333,13 @@ export default function Film() {
       trackTop = track.offsetTop;
       trackH = track.offsetHeight;
       motes.length = 0;
-      const n = mobile ? 26 : 48;
+      const n = mobile ? 18 : 38;
       for (let i = 0; i < n; i++) {
         motes.push({
           x: Math.random() * W,
           y: Math.random() * H,
-          size: 4 + Math.random() * Math.random() * 14,
+          size: 1.2 + Math.random() * 3.2,
           alpha: 0.15 + Math.random() * 0.45,
-          speed: 4 + Math.random() * 12,
           depth: 0.3 + Math.random() * 0.9,
           seed: Math.random() * 100,
         });
@@ -241,14 +350,15 @@ export default function Film() {
     ro.observe(canvas);
     ro.observe(document.body);
 
+    // Stage haze: big, slow, mostly sideways drift along the floor.
     const spawnFlame = (): Flame => ({
       x: Math.random() * W,
-      y: H + 20,
-      vx: (Math.random() - 0.5) * 12,
-      vy: -(40 + Math.random() * 90),
-      life: 0,
-      max: 1.2 + Math.random() * 1.6,
-      size: (mobile ? 40 : 60) + Math.random() * 90,
+      y: H - Math.random() * H * 0.22,
+      vx: (Math.random() < 0.5 ? -1 : 1) * (8 + Math.random() * 18),
+      vy: -(2 + Math.random() * 6),
+      life: Math.random() * 3,
+      max: 7 + Math.random() * 6,
+      size: (mobile ? 220 : 320) + Math.random() * 260,
       seed: Math.random() * 100,
     });
 
@@ -258,6 +368,9 @@ export default function Film() {
     let frame = 0;
     let last = performance.now();
     let time = 0;
+    // The name assembles once after the loader; everything else follows scroll.
+    let intro = reduced ? 1 : 0;
+    let introStart = -1;
 
     // Cached geometry, so a frame never forces layout.
     const readProgress = () => {
@@ -288,9 +401,28 @@ export default function Film() {
 
       // ---- halo -----------------------------------------------------------
       const [hx, hy] = toScreen(250, 230);
-      ctx.globalAlpha = 0.25 + 0.25 * wake;
+      ctx.globalAlpha = 0.3 + 0.3 * wake;
       ctx.drawImage(halo, hx - 300 * s, hy - 300 * s, 600 * s, 600 * s);
+      ctx.globalAlpha = 0.25 * fade;
+      ctx.drawImage(halo, hx - 520 * s + 140 * s, hy - 420 * s, 840 * s, 840 * s);
       ctx.globalAlpha = 1;
+
+      // ---- light shafts from above -----------------------------------------
+      if (fade > 0.001) {
+        ctx.save();
+        ctx.globalCompositeOperation = "lighter";
+        for (let k = 0; k < 3; k++) {
+          const sway = reduced ? 0 : Math.sin(t * 0.25 + k * 2.1) * 0.05;
+          const bx = W * (0.36 + k * 0.14);
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          ctx.translate(bx, -40);
+          ctx.rotate(-0.22 + k * 0.2 + sway);
+          ctx.globalAlpha = (0.05 + 0.05 * wake) * fade * (k === 1 ? 1.3 : 0.9);
+          ctx.drawImage(shaft, -W * 0.09, 0, W * 0.18, H * 1.15);
+        }
+        ctx.restore();
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
 
       // ---- portrait -------------------------------------------------------
       if (layers && fade > 0.001) {
@@ -302,6 +434,14 @@ export default function Film() {
         ctx.drawImage(img, ox, oy, IMG * s, IMG * s);
         ctx.globalAlpha = fade * (1 - wake);
         ctx.drawImage(layers.dark, ox, oy, IMG * s, IMG * s);
+
+        // Rim light: cool blue from the left, ice from the right.
+        ctx.globalCompositeOperation = "lighter";
+        ctx.globalAlpha = fade * (0.25 + 0.4 * wake);
+        ctx.drawImage(layers.rimCool, ox - 4 * s, oy + 1 * s, IMG * s, IMG * s);
+        ctx.globalAlpha = fade * (0.12 + 0.2 * wake);
+        ctx.drawImage(layers.rimIce, ox + 3 * s, oy - 2 * s, IMG * s, IMG * s);
+        ctx.globalCompositeOperation = "source-over";
 
         // Runes: fully lit below the sweep line, a hot band at the line.
         const sweepY = IMG + 40 - ignite * (IMG + 120);
@@ -394,30 +534,28 @@ export default function Film() {
         ctx.fillRect(0, 0, W, H);
       }
 
-      // ---- motes ----------------------------------------------------------
+      // ---- dust in the light --------------------------------------------
       ctx.save();
       ctx.globalCompositeOperation = "lighter";
       for (const m of motes) {
         if (!reduced) {
-          m.y -= m.speed * m.depth * dt;
-          if (m.y < -30) {
-            m.y = H + 30;
+          m.y -= 4 * m.depth * dt;
+          m.x += Math.sin(t * 0.3 + m.seed) * 6 * dt;
+          if (m.y < -10) {
+            m.y = H + 10;
             m.x = Math.random() * W;
           }
         }
-        const y = m.y - p * H * 0.6 * m.depth;
-        const yy = ((y % (H + 60)) + H + 60) % (H + 60) - 30;
-        const x = m.x + Math.sin(t * 0.5 + m.seed) * 14 * m.depth;
-        // twinkle: mostly dim, now and then a bright glint
-        const tw = Math.pow(0.5 + 0.5 * Math.sin(t * (0.8 + m.depth) + m.seed * 7), 3);
-        ctx.globalAlpha = m.alpha * (0.25 + 0.75 * tw);
-        const k = m.size * (0.6 + m.depth * 0.6);
-        ctx.drawImage(mote, x - k / 2, yy - k / 2, k, k);
+        const yy = (((m.y - p * H * 0.5 * m.depth) % (H + 20)) + H + 20) % (H + 20) - 10;
+        const tw = reduced ? 1 : 0.55 + 0.45 * Math.sin(t * (0.8 + m.depth) + m.seed);
+        const sz = m.size * (0.6 + m.depth * 0.6) * 3;
+        ctx.globalAlpha = m.alpha * tw;
+        ctx.drawImage(dust, m.x - sz / 2, yy - sz / 2, sz, sz);
       }
       ctx.restore();
 
-      // ---- moonfire -------------------------------------------------------
-      const heat = (0.55 + 0.45 * range(p, 0.55, 0.7)) * (1 - 0.6 * range(p, 0.8, 0.95));
+      // ---- stage haze -------------------------------------------------------
+      const heat = (0.6 + 0.4 * range(p, 0.55, 0.7)) * (1 - 0.5 * range(p, 0.8, 0.95));
       ctx.save();
       ctx.globalCompositeOperation = "lighter";
       if (!reduced) {
@@ -429,17 +567,17 @@ export default function Film() {
             flames[i] = spawnFlame();
             continue;
           }
-          f.x += (f.vx + Math.sin(t * 3 + f.seed) * 20) * dt;
+          f.x += f.vx * dt;
           f.y += f.vy * dt;
           const k = f.life / f.max;
-          const size = f.size * (1 - k * 0.7);
-          ctx.globalAlpha = heat * 0.5 * Math.sin(Math.PI * k);
-          ctx.drawImage(sprite, f.x - size / 2, f.y - size / 2, size, size);
+          const size = f.size * (0.8 + k * 0.4);
+          ctx.globalAlpha = heat * 0.16 * Math.sin(Math.PI * k);
+          ctx.drawImage(sprite, f.x - size / 2, f.y - size * 0.3, size, size * 0.6);
         }
       }
       const floor = ctx.createLinearGradient(0, H, 0, H - 160);
-      floor.addColorStop(0, `rgba(80,160,255,${0.35 * heat})`);
-      floor.addColorStop(1, "rgba(43,108,176,0)");
+      floor.addColorStop(0, `rgba(47,107,255,${0.22 * heat})`);
+      floor.addColorStop(1, "rgba(11,22,48,0)");
       ctx.globalAlpha = 1;
       ctx.fillStyle = floor;
       ctx.fillRect(0, H - 160, W, 160);
@@ -450,7 +588,7 @@ export default function Film() {
       if (bg) {
         const [sx, sy] = toScreen(250, 170);
         const k = (560 * s) / SIGIL_BASE;
-        const o = (0.07 + 0.15 * ignite) * fade;
+        const o = 0.06 + 0.14 * ignite * fade;
         setStyle(bg, "opacity", o < 0.005 ? "0" : o.toFixed(3));
         setStyle(bg, "visibility", o < 0.005 || k > 4 ? "hidden" : "visible");
         if (o >= 0.005 && k <= 4) {
@@ -465,11 +603,15 @@ export default function Film() {
         const open = range(p, 0.72, 0.86);
         const size = Math.min(W, H) * (mobile ? 1.05 : 0.92);
         setStyle(portal, "opacity", open.toFixed(3));
+        // Hysteresis so the sigil line never flickers at the threshold.
+        if (open > 0.6 && portal.classList.contains("untraced")) portal.classList.remove("untraced");
+        else if (open < 0.35 && !portal.classList.contains("untraced")) portal.classList.add("untraced");
         setStyle(portal, "visibility", open < 0.005 ? "hidden" : "visible");
-        portalLive.current = open >= 0.005;
         if (open >= 0.005) {
           setStyle(portal, "transform", `translate(-50%, -50%) scale(${((size / SIGIL_BASE) * (0.08 + 0.92 * open)).toFixed(4)})`);
-          setVar(portal, "--r1", `${(t * 6 + p * 160).toFixed(2)}deg`);
+          setVar(portal, "--r1", `${(t * 8 + p * 200).toFixed(2)}deg`);
+          setVar(portal, "--r2", `${(-t * 12 - p * 300).toFixed(2)}deg`);
+          setVar(portal, "--r3", `${(t * 5).toFixed(2)}deg`);
         }
       }
 
@@ -482,15 +624,16 @@ export default function Film() {
         const shown = i === 0 ? 1 - range(p, b - 0.01, b + 0.03) : v;
         setStyle(el, "opacity", shown.toFixed(3));
         setStyle(el, "visibility", shown < 0.005 ? "hidden" : "visible");
-        setStyle(el, "transform", `translate3d(0, ${((1 - shown) * 28).toFixed(1)}px, 0)`);
+        setStyle(el, "transform", `translate3d(0, ${((1 - shown) * 18).toFixed(1)}px, 0)`);
+        // Letters are driven by this value too, so scrolling back plays the
+        // reveal in reverse instead of re-triggering anything.
+        setVar(el, "--v", (shown * intro).toFixed(3));
         setStyle(el, "pointerEvents", shown > 0.5 ? "auto" : "none");
         const hidden = shown > 0.5 ? "false" : "true";
         if (el.getAttribute("aria-hidden") !== hidden) el.setAttribute("aria-hidden", hidden);
         if (shown > 0.5) current = i;
       });
       if (current !== lastChapter) {
-        const word = chapterRefs.current[current]?.querySelector<HTMLElement>("[data-decipher]");
-        if (word && lastChapter !== -1 && !reduced) decipher(word);
         if (lastChapter !== -1) window.dispatchEvent(new CustomEvent("arcane:chapter", { detail: current }));
         lastChapter = current;
       }
@@ -501,6 +644,7 @@ export default function Film() {
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
       time += dt;
+      if (introStart >= 0 && intro < 1) intro = smooth(clamp((now - introStart) / 1400));
       readProgress();
       draw(dt);
       if (visible) frame = requestAnimationFrame(loop);
@@ -527,8 +671,7 @@ export default function Film() {
     frame = requestAnimationFrame(loop);
 
     const onReady = () => {
-      const word = chapterRefs.current[0]?.querySelector<HTMLElement>("[data-decipher]");
-      if (word && !reduced) decipher(word, 1200);
+      introStart = performance.now();
     };
     window.addEventListener("arcane:ready", onReady);
 
@@ -547,7 +690,7 @@ export default function Film() {
       <div className="sticky top-0 h-[100svh] overflow-hidden">
         <div
           ref={bgSigilRef}
-          className="pointer-events-none absolute left-0 top-0 origin-center text-moon will-change-transform"
+          className="pointer-events-none absolute left-0 top-0 origin-center text-azure will-change-transform"
           style={{ width: SIGIL_BASE, height: SIGIL_BASE }}
           aria-hidden
         >
@@ -559,29 +702,18 @@ export default function Film() {
         <div
           ref={portalRef}
           aria-hidden
-          className="pointer-events-none invisible absolute left-1/2 top-[42%] origin-center text-moon opacity-0 will-change-transform md:top-[44%]"
+          className="untraced pointer-events-none invisible absolute left-1/2 top-[42%] origin-center text-ice opacity-0 will-change-transform md:top-[44%]"
           style={{ width: SIGIL_BASE, height: SIGIL_BASE }}
         >
-          <Aura activeRef={portalLive} className="absolute inset-[-12%] h-[124%] w-[124%]" />
-          {/* One fine ring of text, turning slowly */}
-          <div className="absolute inset-0 will-change-transform" style={{ transform: "rotate(var(--r1, 0deg))" }}>
-            <svg viewBox="0 0 400 400" className="h-full w-full" fill="none">
-              <defs>
-                <path id="portal-ring" d="M200,200 m-176,0 a176,176 0 1,1 352,0 a176,176 0 1,1 -352,0" />
-              </defs>
-              <text fill="rgba(234,246,255,0.55)" fontSize="7" letterSpacing="3.4" style={{ fontFamily: "var(--font-geist-mono)" }}>
-                <textPath href="#portal-ring">
-                  RYTHME NAGRANI · PROTOCOL ENGINEER · DEVELOPER RELATIONS · BASE · SOLANA · ROOTSTOCK · ZERO KNOWLEDGE · TOKEN2049 ·
-                </textPath>
-              </text>
-            </svg>
-          </div>
+          {/* A painted glow instead of a drop-shadow filter: no per-frame filter work. */}
+          <div className="absolute inset-[-8%] rounded-full bg-[radial-gradient(circle,rgba(47,107,255,0.28)_0%,rgba(47,107,255,0.08)_45%,transparent_70%)]" />
+          <Sigil id="portal-sigil" layered className="h-full w-full" />
         </div>
 
         {/* Vignette and bottom fade keep the copy readable over the art. */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,transparent_45%,rgba(4,5,10,0.85)_100%)]"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,transparent_45%,rgba(4,6,12,0.88)_100%)]"
         />
         <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-ink via-ink/70 to-transparent" />
 
@@ -596,42 +728,51 @@ export default function Film() {
             style={{ opacity: i === 0 ? 1 : 0 }}
             aria-hidden={i === 0 ? "false" : "true"}
           >
-            {ch.lead && <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-moon [text-shadow:0_1px_12px_#04050a,0_0_2px_#04050a] md:text-xs">{ch.lead}</p>}
+            {ch.lead && (
+              <p className="font-mono text-[12px] lowercase tracking-[0.04em] text-ice [text-shadow:0_0_14px_#04060c,0_0_4px_#04060c] md:text-[14px]">
+                {ch.lead}
+              </p>
+            )}
             {i === 0 ? (
-              <h1 className="mt-2 font-display text-[17vw] font-normal leading-[0.9] tracking-[-0.02em] text-white text-glow md:text-[9rem]">
-                <span className="sr-only">{ch.word}</span>
-                <span aria-hidden data-decipher={ch.word}>
-                  {ch.word}
-                </span>
+              <h1 className="scrub mt-2 font-display text-[15vw] font-bold leading-[0.9] tracking-[-0.05em] md:text-[8.5rem]">
+                <Letters text={ch.word} />
               </h1>
             ) : (
               <h2
-                className={`aura-text mt-4 font-display font-normal italic leading-[0.88] tracking-[-0.03em] ${
-                  ch.word.length > 8 ? "text-[14vw] md:text-[8rem]" : "text-[30vw] md:text-[13rem]"
+                className={`scrub mt-1 font-display font-bold leading-[0.85] tracking-[-0.06em] ${
+                  ch.word.length > 8 ? "text-[12.5vw] md:text-[7.5rem]" : "text-[26vw] md:text-[13rem]"
                 }`}
               >
-                <span className="sr-only">{ch.word}</span>
-                <span aria-hidden data-decipher={ch.word}>
-                  {ch.word}
-                </span>
+                <Letters text={ch.word} />
               </h2>
             )}
-            {ch.body && <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-white/85 [text-shadow:0_1px_14px_#04050a] md:text-base">{ch.body}</p>}
+            {ch.body && (
+              <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-white/80 [text-shadow:0_1px_14px_#04060c] md:text-[17px]">
+                {ch.body}
+              </p>
+            )}
             {ch.ctas && (
               <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
-                {ch.ctas.map((c, k) => (
-                  <SpellButton key={c.href + c.label} href={c.href} variant={k === 0 ? "cast" : "trace"}>
-                    {c.label}
-                  </SpellButton>
-                ))}
+                {ch.ctas.map((c, k) =>
+                  c.href === booking.url ? (
+                    <BookButton key={c.href} variant={k === 0 ? "cast" : "trace"}>
+                      {c.label}
+                    </BookButton>
+                  ) : (
+                    <SpellButton key={c.href + c.label} href={c.href} variant={k === 0 ? "cast" : "trace"}>
+                      {c.label}
+                    </SpellButton>
+                  ),
+                )}
               </div>
             )}
+            {ch.note && <p className="mx-auto mt-6 max-w-md font-mono text-[10.5px] leading-relaxed text-white/40">{ch.note}</p>}
           </div>
         ))}
 
         <div ref={hintRef} className="absolute inset-x-0 bottom-[3%] flex flex-col items-center gap-2 text-white/55" aria-hidden>
-          <span className="font-mono text-[10px] uppercase tracking-[0.3em]">Scroll</span>
-          <span className="h-8 w-px animate-pulse bg-gradient-to-b from-moon to-transparent" />
+          <span className="font-mono text-[11px] lowercase tracking-[0.08em]">scroll to cast</span>
+          <span className="h-8 w-px animate-pulse bg-gradient-to-b from-azure to-transparent" />
         </div>
 
       </div>

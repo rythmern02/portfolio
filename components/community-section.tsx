@@ -9,7 +9,7 @@ export default function CommunitySection() {
   return (
     <section id="community" className="px-5 py-24 md:px-6">
       <div className="mx-auto max-w-content">
-        <SectionHeading index="III" eyebrow="Developer relations" title="Developers, brought onchain">
+        <SectionHeading index="03" eyebrow="developer relations" title="Developers, brought onchain">
           Bootcamps, hackathons and build stations across India, run through Web3Spell with ecosystem teams from Solana,
           Arbitrum, Ethereum and more.
         </SectionHeading>
@@ -18,7 +18,7 @@ export default function CommunitySection() {
           {stats.map((s) => (
             <div key={s.label} className="bg-panel px-5 py-6">
               <dt className="text-sm text-white/65">{s.label}</dt>
-              <dd className="mt-1 font-display text-5xl text-white md:text-6xl">{s.value}</dd>
+              <dd className="mt-1 font-display text-3xl font-bold text-white md:text-4xl">{s.value}</dd>
             </div>
           ))}
         </dl>

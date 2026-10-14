@@ -9,7 +9,7 @@ export default function BuildsSection() {
     <section id="builds" className="px-5 py-24 md:px-6">
       <div className="mx-auto max-w-content">
         <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
-          <SectionHeading index="II" eyebrow="Latest builds" title="Fresh from the forge">
+          <SectionHeading index="02" eyebrow="latest builds" title="Fresh from the forge">
             Smaller builds from 2025 and 2026: account abstraction, agent payments, staking and 3D web.
           </SectionHeading>
           <SpellButton href={labs.portfolio} variant="trace" className="shrink-0 self-start md:self-auto">

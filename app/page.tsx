@@ -13,7 +13,8 @@ import CommunitySection from "@/components/community-section"
 import ExperienceSection from "@/components/experience-section"
 import ContactSection from "@/components/contact-section"
 import BookSection from "@/components/book-section"
-import BookingModal from "@/components/booking-modal"
+import BookingModal from "@/components/booking"
+import Sigil from "@/components/arcane/sigil"
 import { labs, profile } from "@/lib/content"
 
 export default function Home() {
@@ -28,11 +29,15 @@ export default function Home() {
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
     const lenis = new Lenis({ autoRaf: true, anchors: { offset: -72 }, lerp: 0.12 })
-    // The booking modal pauses page scrolling while it is open.
-    const onLock = (e: Event) => ((e as CustomEvent<boolean>).detail ? lenis.stop() : lenis.start())
-    window.addEventListener("arcane:lock", onLock)
+    // Freeze the page while the booking modal is open, so the wheel scrolls
+    // the calendar and not the film behind it.
+    const stop = () => lenis.stop()
+    const start = () => lenis.start()
+    window.addEventListener("booking:open", stop)
+    window.addEventListener("booking:close", start)
     return () => {
-      window.removeEventListener("arcane:lock", onLock)
+      window.removeEventListener("booking:open", stop)
+      window.removeEventListener("booking:close", start)
       lenis.destroy()
     }
   }, [])
@@ -48,6 +53,7 @@ export default function Home() {
 
       <Loader onComplete={handleLoaded} />
       <BookingModal />
+      <div aria-hidden className="grain" />
       <WandCursor />
       <RevealObserver />
 
@@ -57,11 +63,13 @@ export default function Home() {
 
       <Film />
 
-      {/* Soft, still pools of light behind the chapters below the film. */}
-      <div
-        aria-hidden
-        className="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(40%_35%_at_12%_20%,rgba(43,108,176,0.16),transparent),radial-gradient(35%_30%_at_88%_70%,rgba(140,110,255,0.12),transparent),radial-gradient(30%_25%_at_60%_105%,rgba(255,150,205,0.07),transparent)]"
-      />
+      {/* A faint, still circle and a pool of blue light behind the chapters. */}
+      <div aria-hidden className="pointer-events-none fixed inset-0 z-0 flex items-center justify-center">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_85%_10%,rgba(47,107,255,0.10),transparent_60%),radial-gradient(ellipse_70%_50%_at_10%_90%,rgba(11,22,48,0.6),transparent_70%)]" />
+        <div className="h-[110vmin] w-[110vmin] rotate-[18deg] text-azure/[0.04]">
+          <Sigil id="ambient-sigil" className="h-full w-full" />
+        </div>
+      </div>
 
       <div className="relative z-10">
         <WorkSection />
@@ -74,7 +82,7 @@ export default function Home() {
         <footer className="border-t border-white/10 px-5 py-10 md:px-6">
           <div className="mx-auto flex max-w-content flex-col gap-3 text-sm text-white/55 md:flex-row md:items-center md:justify-between">
             <p>
-              © {new Date().getFullYear()} {profile.name}. Built with one portrait and a lot of code.
+              © {new Date().getFullYear()} {profile.name}. One portrait, everything else is code.
             </p>
             <p className="flex gap-5">
               <a href={labs.home} target="_blank" rel="noopener" className="hover:text-white">

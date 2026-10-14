@@ -311,15 +311,19 @@ export const experience = [
 ];
 
 export const skills = [
-  { group: "Smart contracts", items: ["Solidity", "Foundry", "Hardhat", "Rust", "Anchor", "Chainlink VRF", "Compound III", "ERC-4337", "ERC-6909"] },
-  { group: "ZK & privacy", items: ["Circom", "Groth16", "snarkjs", "Nillion", "MagicBlock"] },
-  { group: "Full stack", items: ["TypeScript", "Next.js", "React", "Node.js", "Viem", "wagmi", "PostgreSQL", "Docker"] },
-  { group: "Developer relations", items: ["Tutorials & docs", "Sample apps", "Workshops", "Hackathon design & judging", "Podcasting"] },
+  { group: "Smart contracts", items: ["Solidity", "Rust", "Anchor", "Foundry", "Hardhat", "Chainlink VRF", "Compound III", "ERC-4337", "ERC-6909", "EIP-712 / 2612"] },
+  { group: "Security & testing", items: ["Foundry fuzz & invariant tests", "Certora review remediation", "Keeper & slashing design"] },
+  { group: "ZK & privacy", items: ["Circom", "Groth16", "snarkjs", "Nillion MPC / TEE", "MagicBlock ephemeral rollups"] },
+  { group: "Payments & agents", items: ["x402", "Paymasters", "Account abstraction", "Session keys", "Agent-to-agent payments"] },
+  { group: "Full stack", items: ["TypeScript", "Next.js", "React", "Node.js", "Tailwind CSS", "Viem", "wagmi", "RainbowKit", "PostgreSQL", "MongoDB", "Docker", "Vercel"] },
+  { group: "Creative web", items: ["Three.js", "React Three Fiber", "GLSL shaders", "Canvas & WebGL", "Motion design"] },
+  { group: "Chains", items: ["Ethereum", "Base", "Arbitrum", "Solana", "Rootstock", "Starknet", "Initia", "Somnia"] },
+  { group: "Developer relations", items: ["Docs as code", "Tutorials & guides", "Sample apps", "SDK onboarding", "Workshops & bootcamps", "Hackathon design & judging", "Podcasting"] },
 ];
 
 export const education = {
   school: "Samrat Ashok Technological Institute (SATI), Vidisha",
-  degree: "Diploma, Computer Science Engineering",
+  degree: "Computer Science Engineering",
   period: "2022 – 2025",
   certs: "Solana Development (Rust, Anchor), Narra8ive · Blockchain Development, Alchemy University",
 };
@@ -332,6 +336,7 @@ export type FilmChapter = {
   word: string;
   body?: string;
   ctas?: Link[];
+  note?: string;
 };
 
 export const film: FilmChapter[] = [
@@ -361,11 +366,17 @@ export const film: FilmChapter[] = [
   },
   {
     window: [0.8, 1.01],
-    lead: "The circle is open",
-    word: "see what I've cast",
+    lead: "the circle is open",
+    word: "see what i've cast.",
     ctas: [
       { label: "See the work", href: "#work" },
-      { label: "Book a call", href: "book" },
+      { label: "Book a call", href: "https://calendly.com/rythme/30min" },
     ],
+    note: "At the centre: the Kamea of Jupiter, the magic square Agrippa gives in his Occult Philosophy (1531) for gain, favour and peace. Every line sums to 34.",
   },
 ];
+
+export const booking = {
+  url: "https://calendly.com/rythme/30min",
+  length: "30 min",
+};

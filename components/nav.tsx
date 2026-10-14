@@ -5,6 +5,7 @@ import { nav, profile } from "@/lib/content";
 import { sound } from "./arcane/sound";
 import Sigil from "./arcane/sigil";
 import SpellButton from "./arcane/spell-button";
+import { BookButton } from "./booking";
 
 // Icon-only sound toggle: three bars that dance while the ambience plays.
 function SoundToggle() {
@@ -48,13 +49,11 @@ export default function Nav() {
 
     const observer = new IntersectionObserver(
       (entries) => {
-        // The closing booking section belongs to Contact.
-        for (const entry of entries)
-          if (entry.isIntersecting) setActive(entry.target.id === "book" ? "#contact" : `#${entry.target.id}`);
+        for (const entry of entries) if (entry.isIntersecting) setActive(`#${entry.target.id}`);
       },
       { rootMargin: "-30% 0px -65% 0px" },
     );
-    for (const id of ["#top", ...nav.map((n) => n.href), "#book"]) {
+    for (const id of ["#top", ...nav.map((n) => n.href)]) {
       const el = document.querySelector(id);
       if (el) observer.observe(el);
     }
@@ -83,15 +82,11 @@ export default function Nav() {
 
   return (
     <>
-      <header
-        className={`fixed inset-x-0 top-0 z-50 px-4 pb-3 pt-4 transition-colors duration-500 md:px-8 md:pt-5 lg:bg-transparent ${
-          scrolled && !open ? "bg-ink/85 lg:pb-0" : "bg-transparent"
-        }`}
-      >
+      <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4 md:px-8 md:pt-5">
         <nav aria-label="Main" className="mx-auto flex max-w-[84rem] items-center justify-between gap-4">
           <a href="#top" className="group flex items-center gap-2.5" onClick={() => setOpen(false)}>
-            <Sigil id="nav-sigil" className="h-9 w-9 animate-spin-slow text-moon transition duration-500 group-hover:text-white" />
-            <span className="font-display text-[24px] italic leading-none text-white">Rythme</span>
+            <Sigil id="nav-sigil" className="h-9 w-9 animate-spin-slow text-azure transition duration-500 group-hover:text-ice" />
+            <span className="font-display text-[19px] font-bold tracking-[-0.04em] text-white">rythme</span>
           </a>
 
           <div
@@ -120,16 +115,17 @@ export default function Nav() {
             {/* the gliding moon */}
             <span
               aria-hidden
-              className="pointer-events-none absolute -bottom-[3px] h-[6px] w-[6px] -translate-x-1/2 rounded-full bg-moon shadow-[0_0_12px_3px_rgba(143,211,255,0.7)] transition-all duration-500 ease-[cubic-bezier(0.2,0.7,0.2,1)]"
+              className="pointer-events-none absolute -bottom-[3px] h-[6px] w-[6px] -translate-x-1/2 rounded-full bg-moon shadow-[0_0_12px_3px_rgba(143,211,255,0.7)] transition-all duration-500 [transition-timing-function:cubic-bezier(0.2,0.7,0.2,1)]"
               style={{ left: moon ? moon.x + 8 : 0, opacity: moon ? 1 : 0 }}
             />
           </div>
 
           <div className="flex items-center gap-1 md:gap-2">
             <SoundToggle />
-            <SpellButton href={profile.resume} className="hidden !px-5 !py-2.5 md:inline-flex" icon="✦">
+            <SpellButton href={profile.resume} variant="trace" className="hidden md:inline-flex">
               Resume
             </SpellButton>
+            <BookButton className="hidden !py-2.5 !pl-5 !pr-2 md:inline-flex" />
             <button
               type="button"
               className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-full lg:hidden"
@@ -155,7 +151,7 @@ export default function Nav() {
       >
         <Sigil
           id="menu-sigil"
-          className={`pointer-events-none absolute -right-40 top-1/2 h-[36rem] w-[36rem] -translate-y-1/2 text-moon/[0.08] transition-transform duration-[1.5s] ${
+          className={`pointer-events-none absolute -right-40 top-1/2 h-[36rem] w-[36rem] -translate-y-1/2 text-azure/[0.09] transition-transform [transition-duration:1500ms] ${
             open ? "rotate-90" : ""
           }`}
         />
@@ -167,25 +163,26 @@ export default function Nav() {
               style={{ transitionDelay: open ? `${80 + i * 60}ms` : "0ms", opacity: open ? 1 : 0, transform: open ? "none" : "translateY(16px)" }}
             >
               <a href={item.href} onClick={() => setOpen(false)} className="flex items-center gap-4 py-2">
-                <span aria-hidden className={`text-sm ${active === item.href ? "text-moon" : "text-white/20"}`}>
-                  ☾
+                <span aria-hidden className={`font-mono text-xs ${active === item.href ? "text-azure" : "text-white/25"}`}>
+                  0{i + 1}
                 </span>
-                <span className={`font-display text-5xl tracking-[-0.01em] ${active === item.href ? "text-moon" : "text-white"}`}>
+                <span className={`font-display text-5xl font-bold tracking-[-0.04em] ${active === item.href ? "text-ice" : "text-white"}`}>
                   {item.label}
                 </span>
               </a>
             </li>
           ))}
         </ol>
-        <div className="relative mt-12">
-          <SpellButton href={profile.resume} icon="✦">
+        <div className="relative mt-12 flex flex-wrap items-center gap-4">
+          <BookButton />
+          <SpellButton href={profile.resume} variant="trace">
             Resume
           </SpellButton>
         </div>
         <ul className="relative mt-10 flex gap-6 text-sm text-white/55">
           {profile.socials.map((s) => (
             <li key={s.label}>
-              <a href={s.href} target="_blank" rel="noopener" className="hover:text-moon">
+              <a href={s.href} target="_blank" rel="noopener" className="hover:text-ice">
                 {s.label}
               </a>
             </li>

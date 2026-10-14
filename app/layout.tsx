@@ -1,16 +1,15 @@
 import type React from "react";
 import type { Metadata, Viewport } from "next";
-import { Instrument_Serif } from "next/font/google";
+import { Bricolage_Grotesque } from "next/font/google";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { profile, siteUrl } from "@/lib/content";
 import "lenis/dist/lenis.css";
 import "./globals.css";
 
-const serif = Instrument_Serif({
+const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
+  weight: "variable",
   variable: "--font-display",
   display: "swap",
 });
@@ -44,13 +43,13 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#04050a",
+  themeColor: "#05060b",
   colorScheme: "dark",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`dark ${serif.variable} ${GeistSans.variable} ${GeistMono.variable}`}>
+    <html lang="en" className={`dark ${bricolage.variable} ${GeistSans.variable} ${GeistMono.variable}`}>
       <body className="font-sans">{children}</body>
     </html>
   );

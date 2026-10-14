@@ -6,7 +6,7 @@ export default function ExperienceSection() {
     <section id="experience" className="px-5 py-24 md:px-6">
       <div className="mx-auto grid max-w-content gap-14 lg:grid-cols-[1.25fr_1fr] lg:gap-16">
         <div>
-          <SectionHeading index="IV" eyebrow="Experience" title="Where I've worked" />
+          <SectionHeading index="04" eyebrow="experience" title="Where I've worked" />
 
           <ol className="mt-10 border-l border-white/10">
             {experience.map((job) => (
@@ -34,7 +34,7 @@ export default function ExperienceSection() {
         </div>
 
         <div>
-          <SectionHeading index="IV" eyebrow="Skills" title="Toolkit" />
+          <SectionHeading index="04" eyebrow="skills" title="Toolkit" />
           <dl className="mt-10 space-y-6">
             {skills.map((s) => (
               <div key={s.group} data-reveal>

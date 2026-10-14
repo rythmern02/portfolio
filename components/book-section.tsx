@@ -1,26 +1,38 @@
-import Aura from "./arcane/aura";
-import SpellButton from "./arcane/spell-button";
+import { booking } from "@/lib/content";
+import Sigil from "./arcane/sigil";
+import Rise from "./arcane/rise";
+import { BookButton } from "./booking";
 
-// The last thing on the page: one aura, one sentence, one button.
+// The last thing on the page: one clear ask.
 export default function BookSection() {
   return (
-    <section id="book" aria-labelledby="book-title" className="relative flex min-h-[min(64rem,130vw)] items-center overflow-hidden px-5 py-24 md:px-6">
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-[min(118vw,50rem)] w-[min(118vw,50rem)] -translate-x-1/2 -translate-y-1/2" aria-hidden>
-        <Aura className="h-full w-full" />
+    <section id="book" className="relative overflow-hidden px-5 pb-28 pt-24 md:px-6 md:pb-36 md:pt-32">
+      <div aria-hidden className="pointer-events-none absolute inset-0 flex items-center justify-center">
+        <div className="absolute h-[44rem] w-[44rem] rounded-full bg-[radial-gradient(circle,rgba(47,107,255,0.22),rgba(11,22,48,0.15)_45%,transparent_70%)]" />
+        <div className="h-[38rem] w-[38rem] animate-[spin-slow_90s_linear_infinite] text-azure/[0.16] will-change-transform md:h-[46rem] md:w-[46rem]">
+          <Sigil id="book-sigil" className="h-full w-full" />
+        </div>
       </div>
 
-      <div className="relative mx-auto max-w-3xl text-center [text-shadow:0_2px_30px_rgba(4,5,10,0.6)]" data-reveal>
-        <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-moon-soft">Thirty minutes, your pick of time</p>
-        <h2 id="book-title" className="mt-5 font-display text-[3.2rem] leading-[0.95] tracking-[-0.02em] text-white sm:text-7xl md:text-[6.5rem]">
-          Let&apos;s make <span className="aura-text italic">something</span> together.
-        </h2>
-        <p className="mx-auto mt-6 max-w-md text-[15px] leading-relaxed text-white/75 md:text-base">
-          A role, a protocol, a hackathon, a talk. Grab a slot and I&apos;ll come prepared.
+      <div data-reveal className="relative mx-auto max-w-3xl text-center">
+        <p className="eyebrow">
+          <span className="text-azure">(06)</span> book a call
         </p>
-        <div className="mt-9 flex justify-center">
-          <SpellButton href="book" icon="✦" className="spell-xl">
-            Book a call
-          </SpellButton>
+        <h2 className="mt-5 font-display text-[3.4rem] font-bold leading-[0.9] tracking-[-0.055em] text-white md:text-[7rem]">
+          <Rise text="got thirty minutes?" />
+        </h2>
+        <p className="mx-auto mt-6 max-w-lg text-lg leading-relaxed text-white/70">
+          Pick a slot and we&apos;ll talk protocols, developer relations, or whatever you&apos;re building. {booking.length}, on video.
+        </p>
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
+          <BookButton className="!px-7 !py-4 !text-base">Book a 30 min call</BookButton>
+          <a href="#contact" className="spell-trace">
+            <span>or send a message</span>
+            <span aria-hidden className="spell-arrow">
+              ↗
+            </span>
+            <span aria-hidden className="spell-ink" />
+          </a>
         </div>
       </div>
     </section>
