@@ -309,7 +309,8 @@ export const experience = [
 ];
 
 export const skills = [
-  { group: "Smart contracts", items: ["Solidity", "Rust", "Anchor", "Foundry", "Hardhat", "Chainlink VRF", "Compound III", "ERC-4337", "ERC-6909", "EIP-712 / 2612"] },
+  { group: "Smart contracts", items: ["Solidity", "Rust", "Anchor", "Foundry", "Hardhat", "Compound III", "ERC-4337", "ERC-6909", "EIP-712 / 2612"] },
+  { group: "Chainlink & cross-chain", items: ["Chainlink CRE", "Chainlink VRF", "Circle CCTP"] },
   { group: "Security & testing", items: ["Foundry fuzz & invariant tests", "Certora review remediation", "Keeper & slashing design"] },
   { group: "ZK & privacy", items: ["Circom", "Groth16", "snarkjs", "Nillion MPC / TEE", "MagicBlock ephemeral rollups"] },
   { group: "Payments & agents", items: ["x402", "Paymasters", "Account abstraction", "Session keys", "Agent-to-agent payments"] },
