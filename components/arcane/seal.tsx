@@ -133,11 +133,14 @@ export default function Seal({
   table?: boolean;
 }) {
   const drawCls = draw ? "sigil-draw" : "";
+  // Without the rings, crop to the square so the sigil fills the box.
+  const pad = 8;
+  const viewBox = rings ? "0 0 400 400" : `${ORIGIN - pad} ${ORIGIN - pad} ${CELL * 4 + pad * 2} ${CELL * 4 + pad * 2}`;
 
   if (layered) {
     const layer = (v: string | null, children: React.ReactNode) => (
       <div className="absolute inset-0" style={v ? { transform: `rotate(var(${v}, 0deg))`, willChange: "transform" } : undefined}>
-        <svg viewBox="0 0 400 400" className="h-full w-full" fill="none">
+        <svg viewBox={viewBox} className="h-full w-full" fill="none">
           {children}
         </svg>
       </div>
@@ -157,7 +160,7 @@ export default function Seal({
     transformBox: "view-box",
   });
   return (
-    <svg viewBox="0 0 400 400" className={className} style={style} aria-hidden fill="none">
+    <svg viewBox={viewBox} className={className} style={style} aria-hidden fill="none">
       {rings && (
         <>
           <g style={spin("--r1")}>

@@ -38,12 +38,19 @@ function SoundToggle() {
 export default function Nav() {
   const [active, setActive] = useState<string>("");
   const [scrolled, setScrolled] = useState(false);
+  // Past the film, content scrolls under the nav: frost the bar so it never
+  // fights the links. Over the film it stays clear (and the film stays fast).
+  const [frosted, setFrosted] = useState(false);
   const [open, setOpen] = useState(false);
   const linkRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
   const [moon, setMoon] = useState<{ x: number; w: number } | null>(null);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 24);
+      const film = document.getElementById("top");
+      setFrosted(film ? film.getBoundingClientRect().bottom < 90 : window.scrollY > 24);
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
 
@@ -82,12 +89,16 @@ export default function Nav() {
 
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4 md:px-8 md:pt-5">
+      <header className="fixed inset-x-0 top-0 z-50 px-4 pb-3 pt-4 md:px-8 md:pt-5">
+        <div
+          aria-hidden
+          className={`pointer-events-none absolute inset-0 -z-10 border-b border-white/[0.06] bg-ink/55 backdrop-blur-xl backdrop-saturate-150 transition-opacity duration-500 ${
+            frosted && !open ? "opacity-100" : "opacity-0"
+          }`}
+        />
         <nav aria-label="Main" className="mx-auto flex max-w-[84rem] items-center justify-between gap-4">
           <a href="#top" className="group flex items-center gap-2.5" onClick={() => setOpen(false)}>
-            <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/[0.03] transition duration-500 group-hover:border-ice/50">
-              <Seal rings={false} numbers={false} className="h-7 w-7 text-ice" />
-            </span>
+            <Seal rings={false} numbers={false} className="logo-seal h-9 w-9 text-ice transition duration-500 group-hover:text-white" />
             <span className="font-display text-[19px] font-bold tracking-[-0.04em] text-white">rythme</span>
           </a>
 

@@ -573,3 +573,63 @@ dialog.booking[open] .booking-panel {
 .tilt.is-tilting::after {
   opacity: 1;
 }
+
+/* Finale: the ring fills while the page waits to glide; the arrow breathes. */
+.glide-fill {
+  stroke-dasharray: 1;
+  stroke-dashoffset: calc(1 - var(--g, 0));
+  filter: drop-shadow(0 0 4px rgba(207, 230, 255, 0.8));
+}
+.glide-orbit::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  height: 5px;
+  width: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  border-radius: 999px;
+  background: #cfe6ff;
+  box-shadow: 0 0 10px 2px rgba(90, 169, 255, 0.9);
+}
+.glide-orbit {
+  animation: glide-orbit 3.2s linear infinite;
+}
+@keyframes glide-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.glide-arrow {
+  animation: glide-bob 1.8s ease-in-out infinite;
+}
+.glide:hover .glide-arrow {
+  animation-duration: 0.9s;
+}
+@keyframes glide-bob {
+  0%,
+  100% {
+    transform: translate3d(0, -3px, 0);
+  }
+  50% {
+    transform: translate3d(0, 4px, 0);
+  }
+}
+
+/* Nav logo: the sigil redraws itself on hover. */
+.logo-seal .kamea-trace {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  filter: drop-shadow(0 0 3px currentColor);
+}
+.group:hover .logo-seal .kamea-trace {
+  animation: retrace 1.2s cubic-bezier(0.65, 0, 0.35, 1);
+}
+@keyframes retrace {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}

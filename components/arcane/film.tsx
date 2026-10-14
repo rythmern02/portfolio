@@ -4,9 +4,6 @@ import { useEffect, useRef } from "react";
 import type React from "react";
 import { film } from "@/lib/content";
 import Seal from "./seal";
-import SpellButton from "./spell-button";
-import { BookButton } from "../booking";
-import { booking } from "@/lib/content";
 
 // ---------------------------------------------------------------------------
 // The scroll film. One portrait, everything else is procedural:
@@ -238,6 +235,8 @@ type Mote = { x: number; y: number; size: number; alpha: number; depth: number; 
 // The big circles are laid out once at this size and only ever moved with
 // GPU transforms, so they never re-render while animating.
 const SIGIL_BASE = 1000;
+// How long the finale holds before gliding into the work (ms).
+const GLIDE_WAIT = 1400;
 
 // Write a style only when its value actually changed.
 const written = new WeakMap<HTMLElement, Record<string, string>>();
@@ -294,6 +293,7 @@ export default function Film() {
   const portalRef = useRef<HTMLDivElement>(null);
   const chapterRefs = useRef<(HTMLDivElement | null)[]>([]);
   const hintRef = useRef<HTMLDivElement>(null);
+  const glideRef = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
     const track = trackRef.current!;
@@ -645,7 +645,7 @@ export default function Film() {
       prevP = p;
       if (p < 0.8) glided = false;
       if (!glided && !reduced && downward && p >= 0.87) {
-        if (!glideAt) glideAt = performance.now() + 1100;
+        if (!glideAt) glideAt = performance.now() + GLIDE_WAIT;
         else if (performance.now() >= glideAt) {
           glided = true;
           glideAt = 0;
@@ -653,6 +653,11 @@ export default function Film() {
         }
       } else if (glideAt && (p < 0.85 || !downward)) {
         glideAt = 0;
+      }
+      // The finale's ring fills during that beat, so the glide never surprises.
+      if (glideRef.current) {
+        const g = glideAt ? clamp(1 - (glideAt - performance.now()) / GLIDE_WAIT) : glided ? 1 : 0;
+        setVar(glideRef.current, "--g", g.toFixed(3));
       }
 
       if (current !== lastChapter) {
@@ -695,6 +700,16 @@ export default function Film() {
     const onReady = () => {
       introStart = performance.now();
     };
+    // Clicking the finale's ring glides at once (with reduced motion it is a
+    // plain link to the work).
+    const onGlideClick = (e: MouseEvent) => {
+      if (reduced) return;
+      e.preventDefault();
+      glided = true;
+      glideAt = 0;
+      window.dispatchEvent(new Event("arcane:glide"));
+    };
+    glideRef.current?.addEventListener("click", onGlideClick);
     window.addEventListener("arcane:ready", onReady);
 
     return () => {
@@ -704,6 +719,7 @@ export default function Film() {
       io.disconnect();
       document.removeEventListener("visibilitychange", onVis);
       window.removeEventListener("arcane:ready", onReady);
+      glideRef.current?.removeEventListener("click", onGlideClick);
     };
   }, []);
 
@@ -773,20 +789,24 @@ export default function Film() {
                 {ch.body}
               </p>
             )}
-            {ch.ctas && (
-              <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
-                {ch.ctas.map((c, k) =>
-                  c.href === booking.url ? (
-                    <BookButton key={c.href} variant={k === 0 ? "cast" : "trace"}>
-                      {c.label}
-                    </BookButton>
-                  ) : (
-                    <SpellButton key={c.href + c.label} href={c.href} variant={k === 0 ? "cast" : "trace"}>
-                      {c.label}
-                    </SpellButton>
-                  ),
-                )}
-              </div>
+            {i === film.length - 1 && (
+              <a ref={glideRef} href="#work" className="glide group mx-auto mt-8 flex w-max flex-col items-center gap-3" aria-label="Enter the work">
+                <span className="relative block h-16 w-16">
+                  <svg viewBox="0 0 64 64" className="absolute inset-0 h-full w-full -rotate-90" aria-hidden>
+                    <circle cx="32" cy="32" r="30" fill="none" stroke="rgba(207,230,255,0.14)" strokeWidth="1" />
+                    <circle className="glide-fill" cx="32" cy="32" r="30" fill="none" stroke="#cfe6ff" strokeWidth="1.5" strokeLinecap="round" pathLength={1} />
+                  </svg>
+                  <span aria-hidden className="glide-orbit absolute inset-0" />
+                  <span aria-hidden className="glide-arrow absolute inset-0 flex items-center justify-center text-ice">
+                    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                      <path d="M12 5v14M6 13l6 6 6-6" />
+                    </svg>
+                  </span>
+                </span>
+                <span className="font-mono text-[11px] lowercase tracking-[0.06em] text-white/60 transition-colors group-hover:text-white">
+                  entering the work
+                </span>
+              </a>
             )}
             {ch.note && <p className="mx-auto mt-6 max-w-md font-mono text-[10.5px] leading-relaxed text-white/40">{ch.note}</p>}
           </div>

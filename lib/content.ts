@@ -367,10 +367,6 @@ export const film: FilmChapter[] = [
   {
     window: [0.8, 1.01],
     word: "see what i've cast.",
-    ctas: [
-      { label: "See the work", href: "#work" },
-      { label: "Book a call", href: "https://calendly.com/rythme/30min" },
-    ],
     note: "Kamea of Jupiter · Agrippa, 1531 · the table for gain, favour and peace",
   },
 ];
