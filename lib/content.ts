@@ -30,8 +30,6 @@ export type Build = {
   code: string;
 };
 
-// Change this once the custom domain is connected in Vercel.
-export const siteUrl = "https://rythmastic.vercel.app";
 
 export const profile = {
   name: "Rythme Nagrani",
