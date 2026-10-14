@@ -371,6 +371,13 @@ export default function Film() {
     // The name assembles once after the loader; everything else follows scroll.
     let intro = reduced ? 1 : 0;
     let introStart = -1;
+    // Auto-glide: once the finale has fully opened while scrolling down, wait
+    // a beat for the sigil to draw, then hand off to the page to glide into
+    // the work. Scrolling back up before then cancels it.
+    let prevP = 0;
+    let downward = false;
+    let glideAt = 0;
+    let glided = false;
 
     // Cached geometry, so a frame never forces layout.
     const readProgress = () => {
@@ -588,7 +595,7 @@ export default function Film() {
       if (bg) {
         const [sx, sy] = toScreen(250, 170);
         const k = (560 * s) / SIGIL_BASE;
-        const o = 0.06 + 0.14 * ignite * fade;
+        const o = (0.06 + 0.14 * ignite) * fade;
         setStyle(bg, "opacity", o < 0.005 ? "0" : o.toFixed(3));
         setStyle(bg, "visibility", o < 0.005 || k > 4 ? "hidden" : "visible");
         if (o >= 0.005 && k <= 4) {
@@ -633,6 +640,21 @@ export default function Film() {
         if (el.getAttribute("aria-hidden") !== hidden) el.setAttribute("aria-hidden", hidden);
         if (shown > 0.5) current = i;
       });
+      if (p > prevP + 0.0005) downward = true;
+      else if (p < prevP - 0.0005) downward = false;
+      prevP = p;
+      if (p < 0.8) glided = false;
+      if (!glided && !reduced && downward && p >= 0.87) {
+        if (!glideAt) glideAt = performance.now() + 1100;
+        else if (performance.now() >= glideAt) {
+          glided = true;
+          glideAt = 0;
+          window.dispatchEvent(new Event("arcane:glide"));
+        }
+      } else if (glideAt && (p < 0.85 || !downward)) {
+        glideAt = 0;
+      }
+
       if (current !== lastChapter) {
         if (lastChapter !== -1) window.dispatchEvent(new CustomEvent("arcane:chapter", { detail: current }));
         lastChapter = current;

@@ -11,13 +11,14 @@ const SLIDE = "w-[78vw] sm:w-[340px] md:w-[360px]";
 export default function BuildsSection() {
   return (
     <section id="builds" className="py-24">
-      <div className="mx-auto max-w-content px-5 md:px-6">
-        <SectionHeading index="02" eyebrow="latest builds" title="Fresh from the forge">
+      <div className="mx-auto flex max-w-content flex-col gap-4 px-5 md:flex-row md:items-end md:justify-between md:gap-10 md:px-6">
+        <SectionHeading index="02" eyebrow="latest builds" title="Fresh from the forge" />
+        <p data-reveal className="max-w-sm text-[15px] leading-relaxed text-white/60 md:pb-2 md:text-right">
           Account abstraction, agent payments, staking and 3D web, from 2025 and 2026.
-        </SectionHeading>
+        </p>
       </div>
 
-      <div data-reveal className="mt-12">
+      <div data-reveal className="mt-8 md:mt-10">
         <Carousel label="Latest builds" slideClassName={SLIDE}>
           {[
             ...builds.map((b, i) => (

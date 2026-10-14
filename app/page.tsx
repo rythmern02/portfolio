@@ -14,7 +14,6 @@ import ExperienceSection from "@/components/experience-section"
 import ContactSection from "@/components/contact-section"
 import BookSection from "@/components/book-section"
 import BookingModal from "@/components/booking"
-import Seal from "@/components/arcane/seal"
 import { labs, profile } from "@/lib/content"
 
 export default function Home() {
@@ -35,9 +34,14 @@ export default function Home() {
     const start = () => lenis.start()
     window.addEventListener("booking:open", stop)
     window.addEventListener("booking:close", start)
+    // The film asks for this once its finale has opened: glide into the work.
+    const glide = () =>
+      lenis.scrollTo("#work", { offset: 0, duration: 1.8, easing: (t: number) => 1 - Math.pow(1 - t, 4) })
+    window.addEventListener("arcane:glide", glide)
     return () => {
       window.removeEventListener("booking:open", stop)
       window.removeEventListener("booking:close", start)
+      window.removeEventListener("arcane:glide", glide)
       lenis.destroy()
     }
   }, [])
@@ -63,12 +67,10 @@ export default function Home() {
 
       <Film />
 
-      {/* A faint, still circle and a pool of blue light behind the chapters. */}
-      <div aria-hidden className="pointer-events-none fixed inset-0 z-0 flex items-center justify-center">
+      {/* Pools of blue light behind the chapters. No second seal: the film's
+          finale owns the only one on screen. */}
+      <div aria-hidden className="pointer-events-none fixed inset-0 z-0">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_85%_10%,rgba(47,107,255,0.10),transparent_60%),radial-gradient(ellipse_70%_50%_at_10%_90%,rgba(11,22,48,0.6),transparent_70%)]" />
-        <div className="h-[110vmin] w-[110vmin] rotate-[18deg] text-azure/[0.04]">
-          <Seal numbers={false} className="h-full w-full" />
-        </div>
       </div>
 
       <div className="relative z-10">
