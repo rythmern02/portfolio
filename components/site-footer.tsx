@@ -72,7 +72,7 @@ export default function SiteFooter() {
 
         <div className="mt-20 flex flex-col gap-5 border-t border-white/[0.07] py-7 md:flex-row md:items-center md:justify-between">
           <p className="font-mono text-[11px] lowercase tracking-[0.14em] text-white/35">
-            © {new Date().getFullYear()} rythme nagrani · one portrait, everything else is code
+            © {new Date().getFullYear()} rythme nagrani · rythme.world · one portrait, everything else is code
           </p>
           <div className="flex flex-wrap items-center gap-2">
             {["Solidity", "Rust · Anchor", "Zero knowledge", "Developer relations"].map((t) => (
@@ -88,11 +88,11 @@ export default function SiteFooter() {
       </div>
 
       {/* The wordmark. Sized in vw so "rythme.world" always runs edge to edge. */}
-      <div className="spot footer-mark relative select-none border-t border-white/[0.07] px-3 pt-6 md:px-5" aria-label="rythme.world">
+      <div className="spot footer-mark relative select-none border-t border-white/[0.07] px-3 pt-6 md:px-5">
         <div aria-hidden className="pointer-events-none absolute -top-[18vw] right-[4vw] w-[22vw] text-ice/[0.06]" style={{ aspectRatio: "1" }}>
           <Seal numbers={false} className="h-full w-full" />
         </div>
-        <p aria-hidden className="footer-word whitespace-nowrap text-center font-display font-bold leading-[0.78] tracking-[-0.065em]">
+        <p className="footer-word whitespace-nowrap text-center font-display font-bold leading-[0.78] tracking-[-0.065em]">
           rythme<span className="footer-dot">.</span>world
         </p>
       </div>

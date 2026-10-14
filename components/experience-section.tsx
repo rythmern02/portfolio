@@ -51,8 +51,8 @@ export default function ExperienceSection() {
           </dl>
 
           <div data-reveal className="card mt-10 p-5">
-            <p className="font-mono text-xs text-white/55">{education.period}</p>
-            <p className="mt-1 text-sm font-medium text-white">{education.degree}</p>
+            {education.period && <p className="font-mono text-xs text-white/55">{education.period}</p>}
+            <p className="text-sm font-medium text-white">{education.degree}</p>
             <p className="text-sm text-white/70">{education.school}</p>
             <p className="mt-3 text-xs leading-relaxed text-white/60">{education.certs}</p>
           </div>

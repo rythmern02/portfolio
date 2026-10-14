@@ -30,8 +30,6 @@ export type Build = {
   code: string;
 };
 
-// Change this once the custom domain is connected in Vercel.
-export const siteUrl = "https://rythmastic.vercel.app";
 
 export const profile = {
   name: "Rythme Nagrani",
@@ -109,7 +107,7 @@ export const caseStudies: CaseStudy[] = [
   {
     name: "Civitas",
     role: "Co-founder & engineer",
-    period: "2025 – Aug 2026",
+    period: "2025 – 2026",
     chain: "Solana",
     cover: "/work/civitas.webp",
     summary: "Private payroll on Solana. Nobody outside the company can see who was paid or how much.",
@@ -118,7 +116,7 @@ export const caseStudies: CaseStudy[] = [
     stack: ["Anchor (Rust)", "Circom", "Groth16", "Nillion", "MagicBlock", "Next.js"],
     proof: [
       { label: "Shipped on Solana devnet" },
-      { label: "Colosseum Frontier Hackathon, April 2026" },
+      { label: "Colosseum Frontier Hackathon" },
     ],
     live: "https://meetcivitas.xyz",
     code: "https://github.com/MeetCivitas/Civitas-SOL",
@@ -242,10 +240,10 @@ export const events = [
 ];
 
 export const recognition = [
-  "Winner, TOKEN2049 Origins Hackathon, Singapore (2024)",
+  "Winner, TOKEN2049 Origins Hackathon, Singapore",
   "Official community partner, TOKEN2049 Singapore 2025",
   "Official community partner, Consensus Hong Kong 2026",
-  "Thrive Power List, Top 500 (January 2026)",
+  "Thrive Power List, Top 500",
   "Superteam grantee",
 ];
 
@@ -281,7 +279,7 @@ export const experience = [
     org: "Web3Spell Labs",
     href: labs.home,
     role: "Co-founder · Engineering & Developer Relations",
-    period: "May 2024 – now",
+    period: "2024 – now",
     points: [
       "Lead engineering for a studio shipping protocols on Solana, Base, Rootstock and Somnia, from contract design to testnet launch.",
       "Organised 75+ developer events reaching 5,000+ developers, including Arbitrum Ignite and Core Nexus.",
@@ -292,14 +290,14 @@ export const experience = [
     org: "ChainPot",
     href: "https://chainpot.fun",
     role: "Founder & lead engineer",
-    period: "Jun 2025 – now",
+    period: "2025 – now",
     points: ["Seven-contract savings-circle protocol on Base, funded by a $17K Compound grant and reviewed by Certora."],
   },
   {
     org: "Civitas",
     href: "https://meetcivitas.xyz",
     role: "Co-founder & engineer",
-    period: "2025 – Aug 2026",
+    period: "2025 – 2026",
     points: ["Private payroll on Solana with Groth16 proofs, Nillion and MagicBlock. Built for Colosseum Frontier."],
   },
   {
@@ -324,7 +322,7 @@ export const skills = [
 export const education = {
   school: "Samrat Ashok Technological Institute (SATI), Vidisha",
   degree: "Computer Science Engineering",
-  period: "2022 – 2025",
+  period: "",
   certs: "Solana Development (Rust, Anchor), Narra8ive · Blockchain Development, Alchemy University",
 };
 
