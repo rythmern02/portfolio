@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import type React from "react";
 import { film } from "@/lib/content";
-import Sigil from "./sigil";
+import Seal from "./seal";
 import SpellButton from "./spell-button";
 import { BookButton } from "../booking";
 import { booking } from "@/lib/content";
@@ -601,7 +601,7 @@ export default function Film() {
       const portal = portalRef.current;
       if (portal) {
         const open = range(p, 0.72, 0.86);
-        const size = Math.min(W, H) * (mobile ? 1.05 : 0.92);
+        const size = Math.min(W, H) * (mobile ? 0.8 : 0.52);
         setStyle(portal, "opacity", open.toFixed(3));
         // Hysteresis so the sigil line never flickers at the threshold.
         if (open > 0.6 && portal.classList.contains("untraced")) portal.classList.remove("untraced");
@@ -609,9 +609,9 @@ export default function Film() {
         setStyle(portal, "visibility", open < 0.005 ? "hidden" : "visible");
         if (open >= 0.005) {
           setStyle(portal, "transform", `translate(-50%, -50%) scale(${((size / SIGIL_BASE) * (0.08 + 0.92 * open)).toFixed(4)})`);
-          setVar(portal, "--r1", `${(t * 8 + p * 200).toFixed(2)}deg`);
-          setVar(portal, "--r2", `${(-t * 12 - p * 300).toFixed(2)}deg`);
-          setVar(portal, "--r3", `${(t * 5).toFixed(2)}deg`);
+          // Only the bezels turn, slowly, like a watch; the square stays still.
+          setVar(portal, "--r1", `${(t * 3 + p * 60).toFixed(2)}deg`);
+          setVar(portal, "--r2", `${(-t * 2 - p * 40).toFixed(2)}deg`);
         }
       }
 
@@ -694,7 +694,7 @@ export default function Film() {
           style={{ width: SIGIL_BASE, height: SIGIL_BASE }}
           aria-hidden
         >
-          <Sigil id="bg-sigil" layered className="h-full w-full" />
+          <Seal layered table={false} className="h-full w-full" />
         </div>
 
         <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" aria-hidden />
@@ -702,12 +702,12 @@ export default function Film() {
         <div
           ref={portalRef}
           aria-hidden
-          className="untraced pointer-events-none invisible absolute left-1/2 top-[42%] origin-center text-ice opacity-0 will-change-transform md:top-[44%]"
+          className="untraced pointer-events-none invisible absolute left-1/2 top-[34%] origin-center text-ice opacity-0 will-change-transform md:top-[35%]"
           style={{ width: SIGIL_BASE, height: SIGIL_BASE }}
         >
           {/* A painted glow instead of a drop-shadow filter: no per-frame filter work. */}
           <div className="absolute inset-[-8%] rounded-full bg-[radial-gradient(circle,rgba(47,107,255,0.28)_0%,rgba(47,107,255,0.08)_45%,transparent_70%)]" />
-          <Sigil id="portal-sigil" layered className="h-full w-full" />
+          <Seal layered className="h-full w-full [&_.kamea-trace]:[filter:drop-shadow(0_0_6px_currentColor)]" />
         </div>
 
         {/* Vignette and bottom fade keep the copy readable over the art. */}
@@ -740,7 +740,7 @@ export default function Film() {
             ) : (
               <h2
                 className={`scrub mt-1 font-display font-bold leading-[0.85] tracking-[-0.06em] ${
-                  ch.word.length > 8 ? "text-[12.5vw] md:text-[7.5rem]" : "text-[26vw] md:text-[13rem]"
+                  ch.word.length > 8 ? "text-[11.5vw] md:text-[6rem]" : "text-[26vw] md:text-[13rem]"
                 }`}
               >
                 <Letters text={ch.word} />

@@ -14,7 +14,7 @@ import ExperienceSection from "@/components/experience-section"
 import ContactSection from "@/components/contact-section"
 import BookSection from "@/components/book-section"
 import BookingModal from "@/components/booking"
-import Sigil from "@/components/arcane/sigil"
+import Seal from "@/components/arcane/seal"
 import { labs, profile } from "@/lib/content"
 
 export default function Home() {
@@ -67,7 +67,7 @@ export default function Home() {
       <div aria-hidden className="pointer-events-none fixed inset-0 z-0 flex items-center justify-center">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_85%_10%,rgba(47,107,255,0.10),transparent_60%),radial-gradient(ellipse_70%_50%_at_10%_90%,rgba(11,22,48,0.6),transparent_70%)]" />
         <div className="h-[110vmin] w-[110vmin] rotate-[18deg] text-azure/[0.04]">
-          <Sigil id="ambient-sigil" className="h-full w-full" />
+          <Seal numbers={false} className="h-full w-full" />
         </div>
       </div>
 

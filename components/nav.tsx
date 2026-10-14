@@ -3,7 +3,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { nav, profile } from "@/lib/content";
 import { sound } from "./arcane/sound";
-import Sigil from "./arcane/sigil";
+import Seal from "./arcane/seal";
 import SpellButton from "./arcane/spell-button";
 import { BookButton } from "./booking";
 
@@ -85,7 +85,9 @@ export default function Nav() {
       <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4 md:px-8 md:pt-5">
         <nav aria-label="Main" className="mx-auto flex max-w-[84rem] items-center justify-between gap-4">
           <a href="#top" className="group flex items-center gap-2.5" onClick={() => setOpen(false)}>
-            <Sigil id="nav-sigil" className="h-9 w-9 animate-spin-slow text-azure transition duration-500 group-hover:text-ice" />
+            <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/[0.03] transition duration-500 group-hover:border-ice/50">
+              <Seal rings={false} numbers={false} className="h-7 w-7 text-ice" />
+            </span>
             <span className="font-display text-[19px] font-bold tracking-[-0.04em] text-white">rythme</span>
           </a>
 
@@ -149,12 +151,14 @@ export default function Nav() {
         }`}
         inert={!open}
       >
-        <Sigil
-          id="menu-sigil"
-          className={`pointer-events-none absolute -right-40 top-1/2 h-[36rem] w-[36rem] -translate-y-1/2 text-azure/[0.09] transition-transform [transition-duration:1500ms] ${
-            open ? "rotate-90" : ""
+        <div
+          aria-hidden
+          className={`pointer-events-none absolute -right-40 top-1/2 h-[36rem] w-[36rem] -translate-y-1/2 text-azure/[0.12] transition-transform [transition-duration:1500ms] ${
+            open ? "rotate-45" : ""
           }`}
-        />
+        >
+          <Seal numbers={false} className="h-full w-full" />
+        </div>
         <ol className="relative space-y-2">
           {nav.map((item, i) => (
             <li

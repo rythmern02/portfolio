@@ -366,13 +366,12 @@ export const film: FilmChapter[] = [
   },
   {
     window: [0.8, 1.01],
-    lead: "the circle is open",
     word: "see what i've cast.",
     ctas: [
       { label: "See the work", href: "#work" },
       { label: "Book a call", href: "https://calendly.com/rythme/30min" },
     ],
-    note: "At the centre: the Kamea of Jupiter, the magic square Agrippa gives in his Occult Philosophy (1531) for gain, favour and peace. Every line sums to 34.",
+    note: "Kamea of Jupiter · Agrippa, 1531 · the table for gain, favour and peace",
   },
 ];
 

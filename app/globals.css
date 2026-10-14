@@ -436,3 +436,140 @@ dialog.booking[open] .booking-panel {
   color: transparent;
   padding-bottom: 0.06em;
 }
+
+/* Loader: the bezel turns slowly while the seal draws in. */
+@property --r1 {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0deg;
+}
+@property --r2 {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0deg;
+}
+.seal-spin {
+  animation: seal-spin 40s linear infinite;
+}
+@keyframes seal-spin {
+  to {
+    --r1: 360deg;
+    --r2: -360deg;
+  }
+}
+/* The sigil traces after the rings have drawn. */
+.kamea-trace.sigil-draw {
+  animation-duration: 1.5s;
+  animation-delay: 0.45s;
+}
+.loader-name {
+  background: linear-gradient(180deg, #ffffff 0%, #eef6ff 40%, #a9d0ff 70%, #5a97ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: loader-rise 1.1s 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes loader-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+/* Carousels ---------------------------------------------------------------- */
+.carousel-track {
+  /* Slides rest aligned with the page's content column. */
+  --gutter: max(1.25rem, calc((100vw - 72rem) / 2 + 1.5rem));
+  padding-inline: var(--gutter);
+  scroll-padding-inline: var(--gutter);
+  scrollbar-width: none;
+  cursor: grab;
+  outline: none;
+}
+.carousel-track::-webkit-scrollbar {
+  display: none;
+}
+.carousel-track.is-dragging {
+  scroll-snap-type: none;
+  cursor: grabbing;
+  user-select: none;
+}
+.carousel-track.is-dragging * {
+  pointer-events: none;
+}
+.carousel-track:focus-visible {
+  outline: 2px solid #cfe6ff;
+  outline-offset: 4px;
+}
+.carousel-btn {
+  display: flex;
+  height: 2.75rem;
+  width: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #fff;
+  background: rgba(9, 16, 31, 0.6);
+  transition:
+    border-color 0.3s,
+    box-shadow 0.3s,
+    opacity 0.3s;
+}
+.carousel-btn:hover:not(:disabled) {
+  border-color: rgba(207, 230, 255, 0.5);
+  box-shadow: 0 0 24px -4px rgba(47, 107, 255, 0.7);
+}
+.carousel-btn:disabled {
+  opacity: 0.3;
+}
+
+/* Distance from focus, 0..1, as a plain number. */
+.carousel-slide {
+  --ad: min(1, max(var(--d, 0), calc(var(--d, 0) * -1)));
+}
+
+/* Protocol cards: the one in focus is full; neighbours recede and dim. */
+.cs-card {
+  transform: scale(calc(1 - var(--ad) * 0.06));
+  opacity: calc(1 - var(--ad) * 0.55);
+  transform-origin: left center;
+  transition:
+    transform 0.35s ease-out,
+    opacity 0.35s ease-out;
+}
+/* The cover itself never zooms or crops; only the label drifts a little. */
+.cs-cover > span:first-of-type {
+  transform: translate3d(calc(var(--d, 0) * -24px), 0, 0);
+  transition: transform 0.35s ease-out;
+}
+
+/* Forge cards: 3D tilt toward the cursor with a moving glare. */
+.tilt {
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translate3d(0, var(--lift, 0px), 0);
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform-style: preserve-3d;
+}
+.tilt.is-tilting {
+  transition-duration: 0.12s;
+}
+.tilt::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(380px circle at var(--gx, 50%) var(--gy, 0%), rgba(207, 230, 255, 0.16), transparent 55%);
+  transition: opacity 0.4s;
+}
+.tilt.is-tilting::after {
+  opacity: 1;
+}

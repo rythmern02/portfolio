@@ -1,5 +1,5 @@
 import { booking } from "@/lib/content";
-import Sigil from "./arcane/sigil";
+import Seal from "./arcane/seal";
 import Rise from "./arcane/rise";
 import { BookButton } from "./booking";
 
@@ -9,8 +9,8 @@ export default function BookSection() {
     <section id="book" className="relative overflow-hidden px-5 pb-28 pt-24 md:px-6 md:pb-36 md:pt-32">
       <div aria-hidden className="pointer-events-none absolute inset-0 flex items-center justify-center">
         <div className="absolute h-[44rem] w-[44rem] rounded-full bg-[radial-gradient(circle,rgba(47,107,255,0.22),rgba(11,22,48,0.15)_45%,transparent_70%)]" />
-        <div className="h-[38rem] w-[38rem] animate-[spin-slow_90s_linear_infinite] text-azure/[0.16] will-change-transform md:h-[46rem] md:w-[46rem]">
-          <Sigil id="book-sigil" className="h-full w-full" />
+        <div className="h-[38rem] w-[38rem] text-ice/[0.12] md:h-[46rem] md:w-[46rem]">
+          <Seal className="h-full w-full" />
         </div>
       </div>
 

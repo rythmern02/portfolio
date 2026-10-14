@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Sigil from "./arcane/sigil";
+import Seal from "./arcane/seal";
 
 const MIN_MS = 1300; // long enough for the circle to finish drawing
 const MAX_MS = 3200; // never hold the page hostage on a slow network
@@ -75,28 +75,37 @@ export default function Loader({ onComplete }: { onComplete: () => void }) {
       aria-live="polite"
       aria-label="Loading portfolio"
       onClick={() => skipRef.current()}
-      className={`fixed inset-0 z-[70] flex items-center justify-center overflow-hidden bg-ink transition-opacity duration-500 ${
-        phase === "flare" ? "opacity-0 delay-150" : "opacity-100"
+      className={`fixed inset-0 z-[70] flex items-center justify-center overflow-hidden bg-ink transition-opacity duration-700 ${
+        phase === "flare" ? "opacity-0 delay-200" : "opacity-100"
       }`}
     >
-      <div aria-hidden className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(43,108,176,0.3),transparent_55%)]" />
+      <div aria-hidden className="absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(47,107,255,0.22),rgba(11,22,48,0.25)_40%,transparent_70%)]" />
 
       <div className="relative flex flex-col items-center text-center">
+        {/* The bezel draws itself, then the sigil traces through the square. */}
         <div
-          className={`relative h-56 w-56 text-ice transition-transform duration-700 ease-in md:h-72 md:w-72 ${
-            phase === "flare" ? "scale-[6]" : "scale-100"
+          className={`relative h-52 w-52 text-ice transition-[transform,opacity] duration-700 ease-out md:h-64 md:w-64 ${
+            phase === "flare" ? "scale-[1.35] opacity-0" : "scale-100"
           }`}
         >
-          <Sigil id="loader-sigil" draw className="h-full w-full animate-spin-slow drop-shadow-[0_0_18px_rgba(47,107,255,0.7)]" />
+          <div aria-hidden className="absolute inset-[18%] rounded-full bg-[radial-gradient(circle,rgba(47,107,255,0.35),transparent_70%)]" />
+          <Seal layered draw className="seal-spin h-full w-full [&_.kamea-trace]:[filter:drop-shadow(0_0_5px_currentColor)]" />
         </div>
 
-        <p className="mt-10 font-display text-4xl font-bold tracking-[-0.045em] text-white">Rythme Nagrani</p>
-        <p className="mt-3 px-6 font-mono text-[11px] tracking-[0.04em] text-white/55">
-          tracing the table of jupiter · {Math.round(progress)}%
-        </p>
+        <p className="loader-name mt-10 font-display text-[2.6rem] font-bold leading-none tracking-[-0.05em] md:text-5xl">Rythme Nagrani</p>
+
+        <div className="mt-6 flex items-center gap-3 font-mono text-[11px] text-white/45">
+          <span className="relative block h-px w-40 overflow-hidden bg-white/10">
+            <span
+              className="absolute inset-y-0 left-0 bg-gradient-to-r from-ice to-azure transition-[width] duration-200"
+              style={{ width: `${progress}%` }}
+            />
+          </span>
+          <span className="w-8 text-right tabular-nums">{Math.round(progress)}</span>
+        </div>
       </div>
 
-      <p className="absolute bottom-8 font-mono text-[11px] text-white/40">Click or press Esc to skip</p>
+      <p className="absolute bottom-8 font-mono text-[11px] text-white/30">click or press esc to skip</p>
     </div>
   );
 }

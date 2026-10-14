@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 
 // Fades in anything marked data-reveal as it enters the viewport and lets the
-// headings inside it rise. Content stays visible without JavaScript because
+// headings inside it rise; also feeds the cursor position to card spotlights. Content stays visible without JavaScript because
 // the hidden state only applies under html.js.
 export default function RevealObserver() {
   useEffect(() => {
@@ -22,7 +22,26 @@ export default function RevealObserver() {
       { rootMargin: "0px 0px -12% 0px" },
     );
     document.querySelectorAll("main [data-reveal]").forEach((el) => io.observe(el));
-    return () => io.disconnect();
+
+    // Card spotlight: tell the card under the mouse where the cursor is.
+    let frame = 0;
+    const onMove = (e: PointerEvent) => {
+      if (e.pointerType !== "mouse") return;
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const card = (e.target as Element | null)?.closest?.<HTMLElement>(".card");
+        if (!card) return;
+        const r = card.getBoundingClientRect();
+        card.style.setProperty("--mx", `${(e.clientX - r.left).toFixed(0)}px`);
+        card.style.setProperty("--my", `${(e.clientY - r.top).toFixed(0)}px`);
+      });
+    };
+    window.addEventListener("pointermove", onMove, { passive: true });
+    return () => {
+      io.disconnect();
+      cancelAnimationFrame(frame);
+      window.removeEventListener("pointermove", onMove);
+    };
   }, []);
 
   return null;
