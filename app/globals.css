@@ -2,308 +2,817 @@
 @tailwind components;
 @tailwind utilities;
 
-
-@import "tw-animate-css";
-
-@custom-variant dark (&:is(.dark *));
-
-:root {
-  /* Updated to professional dark magic theme - pure black and white only */
-  --background: oklch(0.05 0 0); /* Pure black background */
-  --foreground: oklch(0.98 0 0); /* Pure white text */
-  --card: oklch(0.08 0 0); /* Dark charcoal cards */
-  --card-foreground: oklch(0.98 0 0);
-  --popover: oklch(0.12 0 0); /* Darker popover */
-  --popover-foreground: oklch(0.98 0 0);
-  --primary: oklch(0.95 0 0); /* White primary for contrast */
-  --primary-foreground: oklch(0.05 0 0); /* Black text on white */
-  --secondary: oklch(0.15 0 0); /* Dark gray secondary */
-  --secondary-foreground: oklch(0.85 0 0); /* Light gray text */
-  --muted: oklch(0.18 0 0);
-  --muted-foreground: oklch(0.65 0 0);
-  --accent: oklch(0.92 0 0); /* Bright white accent */
-  --accent-foreground: oklch(0.05 0 0);
-  --destructive: oklch(0.45 0 0);
-  --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.25 0 0);
-  --input: oklch(0.15 0 0);
-  --ring: oklch(0.95 0 0 / 0.3); /* White glow ring */
-  --chart-1: oklch(0.85 0 0);
-  --chart-2: oklch(0.75 0 0);
-  --chart-3: oklch(0.65 0 0);
-  --chart-4: oklch(0.55 0 0);
-  --chart-5: oklch(0.45 0 0);
-  --radius: 0.75rem;
-  --sidebar: oklch(0.05 0 0);
-  --sidebar-foreground: oklch(0.98 0 0);
-  --sidebar-primary: oklch(0.95 0 0);
-  --sidebar-primary-foreground: oklch(0.05 0 0);
-  --sidebar-accent: oklch(0.18 0 0);
-  --sidebar-accent-foreground: oklch(0.98 0 0);
-  --sidebar-border: oklch(0.25 0 0);
-  --sidebar-ring: oklch(0.95 0 0 / 0.3);
-
-  /* Updated custom variables for monochromatic magic theme */
-  --glow-white: oklch(0.98 0 0);
-  --glow-gray: oklch(0.75 0 0);
-  --magic-gradient: linear-gradient(135deg, oklch(0.05 0 0), oklch(0.15 0 0), oklch(0.05 0 0));
-}
-
-.dark {
-  /* Dark mode uses same monochromatic values */
-  --background: oklch(0.02 0 0);
-  --foreground: oklch(0.98 0 0);
-  --card: oklch(0.05 0 0);
-  --card-foreground: oklch(0.98 0 0);
-  --popover: oklch(0.05 0 0);
-  --popover-foreground: oklch(0.98 0 0);
-  --primary: oklch(0.98 0 0);
-  --primary-foreground: oklch(0.02 0 0);
-  --secondary: oklch(0.12 0 0);
-  --secondary-foreground: oklch(0.98 0 0);
-  --muted: oklch(0.12 0 0);
-  --muted-foreground: oklch(0.65 0 0);
-  --accent: oklch(0.12 0 0);
-  --accent-foreground: oklch(0.98 0 0);
-  --destructive: oklch(0.45 0 0);
-  --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.12 0 0);
-  --input: oklch(0.12 0 0);
-  --ring: oklch(0.98 0 0 / 0.3);
-  --chart-1: oklch(0.85 0 0);
-  --chart-2: oklch(0.75 0 0);
-  --chart-3: oklch(0.65 0 0);
-  --chart-4: oklch(0.55 0 0);
-  --chart-5: oklch(0.45 0 0);
-  --sidebar: oklch(0.02 0 0);
-  --sidebar-foreground: oklch(0.98 0 0);
-  --sidebar-primary: oklch(0.85 0 0);
-  --sidebar-primary-foreground: oklch(0.98 0 0);
-  --sidebar-accent: oklch(0.12 0 0);
-  --sidebar-accent-foreground: oklch(0.98 0 0);
-  --sidebar-border: oklch(0.12 0 0);
-  --sidebar-ring: oklch(0.98 0 0 / 0.3);
-}
-
-@theme inline {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
-}
-
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
+  html {
+    background: #04060c;
+    color: #f2f4f8;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
+
   body {
-    @apply bg-background text-foreground;
-    /* Added subtle paper texture overlay */
-    background-image: radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-      radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.01) 1px, transparent 1px),
-      radial-gradient(circle at 45% 85%, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
-    background-size: 100px 100px, 150px 150px, 200px 200px;
+    background: #04060c;
+    font-size: 1rem;
+    line-height: 1.65;
   }
 
-  /* Added illuminati-themed animations and effects */
-  @keyframes illuminatiPulse {
-    0%,
-    100% {
-      opacity: 0.3;
-      transform: scale(1);
-    }
-    50% {
-      opacity: 0.6;
-      transform: scale(1.05);
-    }
+  section[id] {
+    scroll-margin-top: 5rem;
   }
 
-  @keyframes mysticalFloat {
-    0%,
-    100% {
-      transform: translateY(0px) rotate(0deg);
-    }
-    33% {
-      transform: translateY(-8px) rotate(2deg);
-    }
-    66% {
-      transform: translateY(4px) rotate(-1deg);
-    }
+  ::selection {
+    background: rgba(47, 107, 255, 0.45);
+    color: #fff;
   }
 
-  @keyframes crackSpread {
-    0% {
-      stroke-dasharray: 0, 200;
-      opacity: 0;
-    }
-    50% {
-      opacity: 0.8;
-    }
-    100% {
-      stroke-dasharray: 200, 0;
-      opacity: 0.3;
-    }
+  :focus-visible {
+    outline: 2px solid #cfe6ff;
+    outline-offset: 3px;
+    border-radius: 8px;
   }
 
-  @keyframes ancientGlow {
-    0%,
-    100% {
-      text-shadow: 0 0 5px rgba(255, 255, 255, 0.3), 0 0 10px rgba(255, 255, 255, 0.2), 0 0 15px
-        rgba(255, 255, 255, 0.1);
-    }
-    50% {
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 255, 255, 0.3), 0 0 30px
-        rgba(255, 255, 255, 0.2);
-    }
+  /* The wand replaces the pointer on mouse devices. */
+  html.wand,
+  html.wand * {
+    cursor: none !important;
   }
 
-  /* Updated existing animations */
-  @keyframes float {
-    0%,
-    100% {
-      transform: translateY(0px);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
+  html.menu-open,
+  html.booking-open {
+    overflow: hidden;
+  }
+}
+
+@layer components {
+  /* (01) selected work — small, quiet, editorial */
+  .eyebrow {
+    @apply font-mono text-[11px] lowercase tracking-[0.04em] text-white/55;
   }
 
-  @keyframes glow {
-    0%,
-    100% {
-      box-shadow: 0 0 20px var(--glow-white);
-    }
-    50% {
-      box-shadow: 0 0 40px var(--glow-white), 0 0 60px var(--glow-gray);
-    }
-  }
-
-  @keyframes sparkle {
-    0%,
-    100% {
-      opacity: 0;
-      transform: scale(0);
-    }
-    50% {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-
-  @keyframes slideInFromCenter {
-    0% {
-      transform: translate(-50%, -50%) scale(0.8);
-      opacity: 0;
-    }
-    50% {
-      transform: translate(-50%, -50%) scale(1.1);
-      opacity: 1;
-    }
-    100% {
-      transform: translate(0, 0) scale(1);
-      opacity: 1;
-    }
-  }
-
-  /* Added new utility classes for illuminati theme */
-  .animate-illuminati-pulse {
-    animation: illuminatiPulse 4s ease-in-out infinite;
-  }
-
-  .animate-mystical-float {
-    animation: mysticalFloat 6s ease-in-out infinite;
-  }
-
-  .animate-crack-spread {
-    animation: crackSpread 3s ease-out forwards;
-  }
-
-  .animate-ancient-glow {
-    animation: ancientGlow 3s ease-in-out infinite;
-  }
-
-  .animate-float {
-    animation: float 3s ease-in-out infinite;
-  }
-
-  .animate-glow {
-    animation: glow 2s ease-in-out infinite;
-  }
-
-  .animate-sparkle {
-    animation: sparkle 1.5s ease-in-out infinite;
-  }
-
-  .animate-slide-from-center {
-    animation: slideInFromCenter 2s ease-out forwards;
-  }
-
-  .magic-gradient {
-    background: var(--magic-gradient);
+  .section-title {
+    @apply font-display text-[2.4rem] font-bold leading-[0.98] tracking-[-0.045em] text-white md:text-[4rem];
   }
 
   .text-glow {
-    /* Updated text glow to use white instead of cyan */
-    text-shadow: 0 0 10px var(--glow-white), 0 0 20px var(--glow-white), 0 0 30px var(--glow-white);
+    text-shadow: 0 0 40px rgba(47, 107, 255, 0.35), 0 0 90px rgba(61, 123, 255, 0.35);
   }
 
-  /* Added illuminati-specific styling classes */
-  .illuminati-background {
-    position: relative;
+  /* Liquid chrome lettering: a cool silver that catches blue and ice light,
+     with a slow sheen running through it. */
+  .chrome-text {
+    background: linear-gradient(
+      100deg,
+      #7f8fae 0%,
+      #ffffff 18%,
+      #9cc8ff 32%,
+      #4f8dff 44%,
+      #e8f4ff 56%,
+      #7fb8ff 70%,
+      #ffffff 82%,
+      #8796b8 100%
+    );
+    background-size: 220% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: sheen 9s ease-in-out infinite alternate;
   }
 
-  .illuminati-background::before {
+  /* Cards: hairline border and a soft spotlight that follows the cursor. */
+  .card {
+    @apply relative overflow-hidden rounded-[22px] border border-white/[0.08] bg-[#09101f];
+    transition: border-color 0.4s ease;
+  }
+  .card::before {
     content: "";
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.05) 2px, transparent 2px),
-      radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-    background-size: 50px 50px, 80px 80px;
+    z-index: 0;
     pointer-events: none;
+    opacity: 0;
+    background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(47, 107, 255, 0.16), rgba(61, 123, 255, 0.06) 40%, transparent 70%);
+    transition: opacity 0.5s ease;
+  }
+  .card:hover {
+    border-color: rgba(207, 234, 255, 0.18);
+  }
+  .card:hover::before {
+    opacity: 1;
+  }
+  .card > * {
+    position: relative;
     z-index: 1;
   }
 
-  .mystical-border {
-    border-image: linear-gradient(45deg, transparent 25%, rgba(255, 255, 255, 0.3) 50%, transparent 75%) 1;
+  .chip {
+    @apply inline-flex items-center rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-0.5 font-mono text-[11px] text-white/70;
   }
 
-  .ancient-text {
-    font-family: "Times New Roman", serif;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+  .text-link {
+    @apply text-ice underline decoration-ice/30 underline-offset-4 transition-colors hover:decoration-ice;
   }
+
+  /* Buttons. A dark pill with an iridescent chrome rim that slowly turns, and
+     a pool of light inside that follows the cursor. JS adds a magnetic pull. */
+  .spell,
+  .btn-primary,
+  .btn-arcane {
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    overflow: hidden;
+    border-radius: 999px;
+    padding: 0.85rem 1.4rem;
+    font-family: var(--font-geist-sans);
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: #f4f7ff;
+    background: #0b0d17;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.09),
+      0 10px 30px -12px rgba(47, 107, 255, 0.55);
+    transition:
+      transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
+      box-shadow 0.5s ease;
+  }
+  .spell::before,
+  .btn-primary::before,
+  .btn-arcane::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(
+      from var(--spell-angle),
+      #8c96b8,
+      #ffffff,
+      #2f6bff,
+      #2f6bff,
+      #cfe6ff,
+      #5aa9ff 70%,
+      #8c96b8
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0.75;
+    animation: spell-orbit 6s linear infinite;
+  }
+  .spell::after,
+  .btn-primary::after,
+  .btn-arcane::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    border-radius: inherit;
+    opacity: 0;
+    background:
+      radial-gradient(110px circle at var(--mx, 50%) var(--my, 50%), rgba(207, 234, 255, 0.45), transparent 60%),
+      radial-gradient(220px circle at var(--mx, 50%) var(--my, 50%), rgba(47, 107, 255, 0.45), transparent 70%);
+    transition: opacity 0.4s ease;
+  }
+  .spell:hover,
+  .spell:focus-visible,
+  .btn-primary:hover,
+  .btn-arcane:hover {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      0 18px 50px -14px rgba(47, 107, 255, 0.85);
+  }
+  .spell:hover::before,
+  .btn-primary:hover::before,
+  .btn-arcane:hover::before {
+    opacity: 1;
+    animation-duration: 2.4s;
+  }
+  .spell:hover::after,
+  .spell:focus-visible::after,
+  .btn-primary:hover::after,
+  .btn-arcane:hover::after {
+    opacity: 1;
+  }
+  .spell-glyph {
+    display: inline-flex;
+    height: 1.35rem;
+    width: 1.35rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: radial-gradient(circle at 35% 30%, #ffffff, #9cc8ff 35%, #2f6bff 70%, #0b1630 100%);
+    color: #0b0d17;
+    font-size: 0.7rem;
+    transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .spell:hover .spell-glyph {
+    transform: rotate(45deg) scale(1.08);
+  }
+
+  /* Trace: a quiet text link whose underline draws itself in. */
+  .spell-trace,
+  .btn-ghost {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.85rem 0.25rem;
+    font-family: var(--font-geist-sans);
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: rgba(255, 255, 255, 0.72);
+    transition: color 0.3s ease;
+  }
+  .spell-trace:hover,
+  .spell-trace:focus-visible,
+  .btn-ghost:hover {
+    color: #ffffff;
+  }
+  .spell-arrow {
+    color: #9cc8ff;
+    transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .spell-trace:hover .spell-arrow {
+    transform: translate(3px, -3px);
+  }
+  .spell-ink {
+    position: absolute;
+    left: 0.25rem;
+    bottom: 0.55rem;
+    height: 1px;
+    width: calc(100% - 0.5rem);
+    transform: scaleX(0);
+    transform-origin: right;
+    background: linear-gradient(90deg, #cfe6ff, #2f6bff, #2f6bff);
+    transition: transform 0.55s cubic-bezier(0.65, 0, 0.35, 1);
+  }
+  .spell-trace:hover .spell-ink,
+  .spell-trace:focus-visible .spell-ink {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  .btn-ghost {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 0;
+    padding-bottom: 0.45rem;
+  }
+  .btn-ghost:hover {
+    border-color: #cfe6ff;
+  }
+
+  /* Loader: the circle's strokes draw themselves in. */
+  .sigil-draw {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 1.2s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  }
+}
+
+/* Words rise out of a mask, one after another. */
+.rise .w {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+.rise .w > span {
+  display: inline-block;
+  transform: translate3d(0, 105%, 0);
+  transition: transform 0.95s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition-delay: calc(var(--i, 0) * 70ms);
+}
+html:not(.js) .rise .w > span,
+.is-in .rise .w > span,
+.rise.is-in .w > span {
+  transform: none;
+}
+
+/* Scroll reveal. Hidden state only applies once JavaScript is running. */
+html.js main [data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  transition:
+    opacity 0.9s cubic-bezier(0.2, 0.7, 0.2, 1),
+    transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+html.js main [data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Film grain over the whole page: rendered once, tiled, never animated. */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 75;
+  pointer-events: none;
+  opacity: 0.32;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 1.6 -0.3'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-size: 180px 180px;
+}
+
+/* Booking modal */
+dialog.booking {
+  margin: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  max-width: none;
+  max-height: none;
+}
+dialog.booking::backdrop {
+  background: rgba(3, 4, 9, 0.82);
+}
+dialog.booking[open] .booking-panel {
+  animation: booking-in 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@property --spell-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes spell-orbit {
+  to {
+    --spell-angle: 360deg;
+  }
+}
+
+@keyframes sheen {
+  from {
+    background-position: 0% 50%;
+  }
+  to {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes booking-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Sound toggle bars */
+.eq-bar {
+  height: 4px;
+  animation: eq 0.9s ease-in-out infinite;
+}
+@keyframes eq {
+  0%,
+  100% {
+    height: 4px;
+  }
+  50% {
+    height: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html.js main [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+  .rise .w > span {
+    transform: none;
+  }
+}
+
+/* The Kamea sigil line. Fully drawn by default; inside an .untraced parent it
+   retracts, and it redraws with a transition when the class comes off, so
+   scrolling back and forth plays it smoothly both ways. */
+.kamea-trace {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  filter: drop-shadow(0 0 3px currentColor);
+  transition: stroke-dashoffset 1.8s cubic-bezier(0.65, 0, 0.35, 1);
+}
+.untraced .kamea-trace {
+  stroke-dashoffset: 1;
+  transition-duration: 0.6s;
+}
+
+/* Film lettering. Each letter reads the chapter's --v (0 to 1, set from
+   scroll) and its own index, so the word assembles left to right as you
+   scroll in and takes itself apart as you scroll back. Nothing is timed. */
+.scrub .l {
+  --l: clamp(0, calc(var(--v, 1) * 2 - var(--i) / var(--n)), 1);
+  display: inline-block;
+  opacity: var(--l);
+  transform: translate3d(0, calc((1 - var(--l)) * 0.32em), 0);
+  background: linear-gradient(180deg, #ffffff 0%, #eef6ff 36%, #a9d0ff 62%, #5a97ff 86%, #2f6bff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  padding-bottom: 0.06em;
+}
+
+/* Loader: the bezel turns slowly while the seal draws in. */
+@property --r1 {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0deg;
+}
+@property --r2 {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0deg;
+}
+.seal-spin {
+  animation: seal-spin 40s linear infinite;
+}
+@keyframes seal-spin {
+  to {
+    --r1: 360deg;
+    --r2: -360deg;
+  }
+}
+/* The sigil traces after the rings have drawn. */
+.kamea-trace.sigil-draw {
+  animation-duration: 1.5s;
+  animation-delay: 0.45s;
+}
+
+/* Carousels ---------------------------------------------------------------- */
+.carousel-track {
+  /* Slides rest aligned with the page's content column. */
+  --gutter: max(1.25rem, calc((100vw - 72rem) / 2 + 1.5rem));
+  padding-inline: var(--gutter);
+  scroll-padding-inline: var(--gutter);
+  scrollbar-width: none;
+  cursor: grab;
+  outline: none;
+}
+.carousel-track::-webkit-scrollbar {
+  display: none;
+}
+.carousel-track.is-dragging {
+  scroll-snap-type: none;
+  cursor: grabbing;
+  user-select: none;
+}
+.carousel-track.is-dragging * {
+  pointer-events: none;
+}
+.carousel-track:focus-visible {
+  outline: 2px solid #cfe6ff;
+  outline-offset: 4px;
+}
+.carousel-btn {
+  display: flex;
+  height: 2.75rem;
+  width: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #fff;
+  background: rgba(9, 16, 31, 0.6);
+  transition:
+    border-color 0.3s,
+    box-shadow 0.3s,
+    opacity 0.3s;
+}
+.carousel-btn:hover:not(:disabled) {
+  border-color: rgba(207, 230, 255, 0.5);
+  box-shadow: 0 0 24px -4px rgba(47, 107, 255, 0.7);
+}
+.carousel-btn:disabled {
+  opacity: 0.3;
+}
+
+/* Distance from focus, 0..1, as a plain number. */
+.carousel-slide {
+  --ad: min(1, max(var(--d, 0), calc(var(--d, 0) * -1)));
+}
+
+/* Protocol cards: the one in focus is full; neighbours recede and dim. */
+.cs-card {
+  transform: scale(calc(1 - var(--ad) * 0.06));
+  opacity: calc(1 - var(--ad) * 0.55);
+  transform-origin: left center;
+  transition:
+    transform 0.35s ease-out,
+    opacity 0.35s ease-out;
+}
+/* The cover itself never zooms or crops; only the label drifts a little. */
+.cs-cover > span:first-of-type {
+  transform: translate3d(calc(var(--d, 0) * -24px), 0, 0);
+  transition: transform 0.35s ease-out;
+}
+
+/* Forge cards: 3D tilt toward the cursor with a moving glare. */
+.tilt {
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translate3d(0, var(--lift, 0px), 0);
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform-style: preserve-3d;
+}
+.tilt.is-tilting {
+  transition-duration: 0.12s;
+}
+.tilt::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(380px circle at var(--gx, 50%) var(--gy, 0%), rgba(207, 230, 255, 0.16), transparent 55%);
+  transition: opacity 0.4s;
+}
+.tilt.is-tilting::after {
+  opacity: 1;
+}
+
+/* Finale: the ring fills while the page waits to glide; the arrow breathes. */
+.glide-fill {
+  stroke-dasharray: 1;
+  stroke-dashoffset: calc(1 - var(--g, 0));
+  filter: drop-shadow(0 0 4px rgba(207, 230, 255, 0.8));
+}
+.glide-orbit::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  height: 5px;
+  width: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  border-radius: 999px;
+  background: #cfe6ff;
+  box-shadow: 0 0 10px 2px rgba(90, 169, 255, 0.9);
+}
+.glide-orbit {
+  animation: glide-orbit 3.2s linear infinite;
+}
+@keyframes glide-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.glide-arrow {
+  animation: glide-bob 1.8s ease-in-out infinite;
+}
+.glide:hover .glide-arrow {
+  animation-duration: 0.9s;
+}
+@keyframes glide-bob {
+  0%,
+  100% {
+    transform: translate3d(0, -3px, 0);
+  }
+  50% {
+    transform: translate3d(0, 4px, 0);
+  }
+}
+
+/* Nav logo: the sigil redraws itself on hover. */
+.logo-seal .kamea-trace {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  filter: drop-shadow(0 0 3px currentColor);
+}
+.group:hover .logo-seal .kamea-trace {
+  animation: retrace 1.2s cubic-bezier(0.65, 0, 0.35, 1);
+}
+@keyframes retrace {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Finale headline: a sweep of light runs across the whole phrase every few
+   seconds. Each letter shows its own slice of one shared gradient, so the
+   sheen reads as continuous across the word. */
+@property --s {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: -0.3;
+}
+.cast {
+  animation: cast-sheen 6s cubic-bezier(0.45, 0, 0.25, 1) 1.2s infinite;
+}
+.cast .l {
+  background-image:
+    linear-gradient(
+      100deg,
+      transparent calc(var(--s) * 100% - 14%),
+      rgba(255, 255, 255, 0.95) calc(var(--s) * 100%),
+      transparent calc(var(--s) * 100% + 14%)
+    ),
+    linear-gradient(180deg, #ffffff 0%, #eef6ff 36%, #a9d0ff 62%, #5a97ff 86%, #2f6bff 100%);
+  background-size:
+    calc(var(--n) * 100%) 100%,
+    100% 100%;
+  background-position:
+    calc(var(--i) / (var(--n) - 1) * 100%) 0,
+    0 0;
+  background-repeat: no-repeat;
+}
+@keyframes cast-sheen {
+  0% {
+    --s: -0.3;
+  }
+  32%,
+  100% {
+    --s: 1.3;
+  }
+}
+
+/* Star glints: four-point stars that bloom and fade over the letters. */
+.glints {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.glints i {
+  position: absolute;
+  width: calc(34px * var(--gs, 1));
+  height: calc(34px * var(--gs, 1));
+  margin: calc(-17px * var(--gs, 1)) 0 0 calc(-17px * var(--gs, 1));
+  opacity: 0;
+  animation: glint 3.4s ease-in-out infinite;
+}
+.glints i::before,
+.glints i::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border-radius: 999px;
+  background: radial-gradient(closest-side, #ffffff, rgba(207, 230, 255, 0.7) 40%, transparent);
+}
+.glints i::before {
+  width: 100%;
+  height: 7%;
+  transform: translate(-50%, -50%);
+}
+.glints i::after {
+  width: 7%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+}
+@keyframes glint {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.2) rotate(0deg);
+  }
+  45% {
+    opacity: 1;
+    transform: scale(1) rotate(45deg);
+  }
+  60% {
+    opacity: 0.85;
+    transform: scale(0.85) rotate(60deg);
+  }
+}
+
+/* Loader -------------------------------------------------------------------- */
+@property --hole {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+.loader {
+  --hx: 50vw;
+  --hy: 42vh;
+}
+/* The veil gets a hole that grows from the seal: the eye opening onto the page. */
+.loader-veil {
+  -webkit-mask-image: radial-gradient(circle at var(--hx) var(--hy), transparent var(--hole), #000 calc(var(--hole) + 2px));
+  mask-image: radial-gradient(circle at var(--hx) var(--hy), transparent var(--hole), #000 calc(var(--hole) + 2px));
+  transition: --hole 1s cubic-bezier(0.7, 0, 0.2, 1);
+}
+.loader.is-opening .loader-veil {
+  --hole: 150vmax;
+}
+/* The rim grows in real size (not scale) so it stays a crisp line of light,
+   tracking the edge of the hole exactly. */
+.loader-rim {
+  left: var(--hx);
+  top: var(--hy);
+  width: calc(var(--hole) * 2);
+  height: calc(var(--hole) * 2);
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  border: 1.5px solid rgba(207, 230, 255, 0.95);
+  box-shadow:
+    0 0 18px 2px rgba(90, 169, 255, 0.75),
+    inset 0 0 18px 2px rgba(90, 169, 255, 0.45);
+  opacity: 0;
+  transition: --hole 1s cubic-bezier(0.7, 0, 0.2, 1), opacity 1s ease-in;
+}
+.loader.is-opening .loader-rim {
+  --hole: 150vmax;
+  opacity: 0;
+  animation: rim-flash 1s ease-out forwards;
+}
+@keyframes rim-flash {
+  0% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+/* A breathing core of light behind the seal. */
+.loader-core {
+  background: radial-gradient(circle, rgba(207, 230, 255, 0.35), rgba(47, 107, 255, 0.25) 40%, transparent 70%);
+  animation: core-breathe 2.4s ease-in-out infinite;
+}
+@keyframes core-breathe {
+  0%,
+  100% {
+    transform: scale(0.9);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+/* The name forms letter by letter, each sharpening out of a soft glow. */
+.loader-l {
+  display: inline-block;
+  background: linear-gradient(180deg, #ffffff 0%, #eef6ff 40%, #a9d0ff 70%, #5a97ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: loader-letter 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(0.5s + var(--i) * 55ms);
+}
+@keyframes loader-letter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 0.35em, 0) scale(0.9);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+/* Footer wordmark ---------------------------------------------------------- */
+.footer-mark {
+  container-type: inline-size;
+}
+.footer-word {
+  /* "rythme.world" in Bricolage Bold at this tracking is 5.85em wide, so this
+     runs it edge to edge of the container on any screen. */
+  font-size: calc(100cqw / 5.95);
+  padding-bottom: 0.02em;
+  background:
+    radial-gradient(28vw circle at var(--mx, 50%) var(--my, 40%), rgba(255, 255, 255, 0.55), transparent 60%),
+    linear-gradient(180deg, #cfe6ff 0%, #8db8ff 30%, #2f6bff 58%, rgba(11, 22, 48, 0) 92%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  /* The bottom of the letters sinks into the page edge, like the reference. */
+  margin-bottom: -0.16em;
+}
+.footer-dot {
+  color: transparent;
+  background: linear-gradient(180deg, #ffffff, #5aa9ff);
+  -webkit-background-clip: text;
+  background-clip: text;
 }

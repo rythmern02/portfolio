@@ -1,85 +1,88 @@
 "use client"
 
-import { useState } from "react"
+import { useCallback, useEffect, useState } from "react"
+import Lenis from "lenis"
 import Loader from "@/components/loader"
-import WizardIntro, { PermanentWizardPortrait } from "@/components/wizard-intro"
-import HeroSection from "@/components/hero-section"
+import Nav from "@/components/nav"
+import Film from "@/components/arcane/film"
+import WandCursor from "@/components/arcane/wand-cursor"
+import RevealObserver from "@/components/arcane/reveal"
+import WorkSection from "@/components/work-section"
+import BuildsSection from "@/components/builds-section"
+import CommunitySection from "@/components/community-section"
 import ExperienceSection from "@/components/experience-section"
-import ProjectsSection from "@/components/project-section"
-import SkillsSection from "@/components/skills-section"
 import ContactSection from "@/components/contact-section"
+import BookSection from "@/components/book-section"
+import BookingModal from "@/components/booking"
+import SiteFooter from "@/components/site-footer"
 
 export default function Home() {
-  const [loadingComplete, setLoadingComplete] = useState(false)
-  const [wizardAnimationComplete, setWizardAnimationComplete] = useState(false)
-  const [showContent, setShowContent] = useState(false)
+  const [ready, setReady] = useState(false)
 
-  const handleLoadingComplete = () => {
-    setLoadingComplete(true)
-  }
+  const handleLoaded = useCallback(() => {
+    setReady(true)
+    window.dispatchEvent(new Event("arcane:ready"))
+  }, [])
 
-  const handleWizardAnimationComplete = () => {
-    setWizardAnimationComplete(true)
-    // Small delay before showing content for smooth transition
-    setTimeout(() => setShowContent(true), 5)
-  }
+  // Smooth, weighted scrolling: it is what makes the film feel like a camera.
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
+    const lenis = new Lenis({ autoRaf: true, anchors: { offset: -72 }, lerp: 0.12 })
+    // Freeze the page while the booking modal is open, so the wheel scrolls
+    // the calendar and not the film behind it.
+    const stop = () => lenis.stop()
+    const start = () => lenis.start()
+    window.addEventListener("booking:open", stop)
+    window.addEventListener("booking:close", start)
+    // The film asks for this once its finale has opened: glide into the work.
+    const glide = () =>
+      lenis.scrollTo("#work", { offset: 0, duration: 1.8, easing: (t: number) => 1 - Math.pow(1 - t, 4) })
+    window.addEventListener("arcane:glide", glide)
+    return () => {
+      window.removeEventListener("booking:open", stop)
+      window.removeEventListener("booking:close", start)
+      window.removeEventListener("arcane:glide", glide)
+      lenis.destroy()
+    }
+  }, [])
 
   return (
-    <main className="min-h-screen bg-background text-foreground overflow-x-hidden relative ">
-      <div
-        className="fixed inset-0 w-full h-full opacity-30 pointer-events-none z-0"
-        style={{
-          backgroundImage: "url('/illuminati-background.svg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          backgroundAttachment: "fixed",
-        }}
-      />
+    <main className="relative min-h-screen overflow-x-clip bg-ink text-white">
+      <a
+        href="#work"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[90] focus:rounded-full focus:bg-white focus:px-4 focus:py-2 focus:text-ink"
+      >
+        Skip to work
+      </a>
 
-      <div className="fixed inset-0 bg-black/30 pointer-events-none z-10" />
+      <Loader onComplete={handleLoaded} />
+      <BookingModal />
+      <div aria-hidden className="grain" />
+      <WandCursor />
+      <RevealObserver />
 
-      {/* Loading Screen */}
-      {!loadingComplete && (
-        <div className="relative z-20">
-          <Loader onComplete={handleLoadingComplete} />
-        </div>
-      )}
+      <div className={`transition-opacity duration-700 ${ready ? "opacity-100" : "opacity-0"}`}>
+        <Nav />
+      </div>
 
-      {/* Wizard Introduction Animation */}
-      {loadingComplete && !wizardAnimationComplete && (
-        <div className="relative z-20">
-          <WizardIntro onAnimationComplete={handleWizardAnimationComplete} />
-        </div>
-      )}
+      <Film />
 
-      {wizardAnimationComplete && <PermanentWizardPortrait />}
+      {/* Pools of blue light behind the chapters. No second seal: the film's
+          finale owns the only one on screen. */}
+      <div aria-hidden className="pointer-events-none fixed inset-0 z-0">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_85%_10%,rgba(47,107,255,0.10),transparent_60%),radial-gradient(ellipse_70%_50%_at_10%_90%,rgba(11,22,48,0.6),transparent_70%)]" />
+      </div>
 
-      {/* Main Content */}
-      {showContent && (
-        <div className="animate-in fade-in duration-0 md:duration-1000 relative z-20">
-          <HeroSection />
-          <ExperienceSection />
-          <ProjectsSection />
-          <SkillsSection />
-          <ContactSection />
+      <div className="relative z-10">
+        <WorkSection />
+        <BuildsSection />
+        <CommunitySection />
+        <ExperienceSection />
+        <ContactSection />
+        <BookSection />
 
-          {/* Footer */}
-          <footer className="py-12 px-6 border-t border-border/50 backdrop-blur-sm bg-black/30">
-            <div className="max-w-6xl mx-auto text-center space-y-4">
-              <div className="flex items-center justify-center gap-2 text-muted-foreground">
-                <span className="text-lg">△</span>
-                <p>© 456 BC Rythme Nagrani. Crafted with ancient wisdom and modern code</p>
-                <span className="text-lg">△</span>
-              </div>
-              <p className="text-sm text-muted-foreground font-mono">
-                Blockchain Wizard • Illuminati of Code • Master of Digital Realms
-              </p>
-              <p className="text-xs opacity-20 font-mono tracking-widest">ORDO AB CHAO • NOVUS ORDO SECLORUM</p>
-            </div>
-          </footer>
-        </div>
-      )}
+        <SiteFooter />
+      </div>
     </main>
   )
 }
