@@ -274,12 +274,19 @@ export const writing: Link[] = [
   },
 ];
 
+// Shown under the Experience heading.
+export const experienceHighlight = {
+  value: "5+",
+  label: "years in Web3",
+  line: "Building protocols and developer communities since 2022: engineering, developer relations and ecosystem programs.",
+};
+
 export const experience = [
   {
     org: "Web3Spell Labs",
     href: labs.home,
     role: "Co-founder · Engineering & Developer Relations",
-    period: "2024 – now",
+    period: "2022 – now",
     points: [
       "Lead engineering for a studio shipping protocols on Solana, Base, Rootstock and Somnia, from contract design to testnet launch.",
       "Organised 75+ developer events reaching 5,000+ developers, including Arbitrum Ignite and Core Nexus.",
@@ -302,8 +309,8 @@ export const experience = [
   },
   {
     org: "SNS · Oraichain · Push Protocol",
-    role: "Freelance developer advocate",
-    period: "2023 – 2025",
+    role: "Ambassador & freelance developer advocate",
+    period: "2022 – 2025",
     points: ["Tutorials, workshops and onboarding as ambassador and developer advocate."],
   },
 ];
