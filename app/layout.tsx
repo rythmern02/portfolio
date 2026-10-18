@@ -114,7 +114,7 @@ const jsonLd = {
       alumniOf: { "@type": "CollegeOrUniversity", name: "Samrat Ashok Technological Institute (SATI), Vidisha" },
       address: { "@type": "PostalAddress", addressLocality: "Bhopal", addressCountry: "IN" },
       award: ["Winner, TOKEN2049 Origins Hackathon, Singapore", "Thrive Power List, Top 500"],
-      knowsAbout: ["Solidity", "Rust", "Anchor", "Solana", "Base", "Rootstock", "Zero-knowledge proofs", "Developer relations", "DeFi"],
+      knowsAbout: ["Solidity", "Rust", "Anchor", "Solana", "Base", "Rootstock", "Chainlink", "Zero-knowledge proofs", "Developer relations", "DeFi"],
       sameAs: [...profile.socials.map((s) => s.href), "https://labs.web3spell.fun"],
     },
   ],

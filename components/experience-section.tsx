@@ -1,4 +1,4 @@
-import { education, experience, skills } from "@/lib/content";
+import { education, experience, experienceHighlight, skills } from "@/lib/content";
 import SectionHeading from "./section-heading";
 
 export default function ExperienceSection() {
@@ -7,6 +7,16 @@ export default function ExperienceSection() {
       <div className="mx-auto grid max-w-content gap-14 lg:grid-cols-[1.25fr_1fr] lg:gap-16">
         <div>
           <SectionHeading index="04" eyebrow="experience" title="Where I've worked" />
+
+          <div data-reveal className="mt-8 flex items-center gap-5 rounded-2xl border border-white/[0.08] bg-white/[0.02] px-5 py-4">
+            <p className="shrink-0 font-display text-5xl font-bold leading-none tracking-[-0.05em]">
+              <span className="bg-gradient-to-b from-white via-ice to-azure bg-clip-text text-transparent">{experienceHighlight.value}</span>
+            </p>
+            <div>
+              <p className="text-[15px] font-medium text-white">{experienceHighlight.label}</p>
+              <p className="mt-0.5 text-sm leading-snug text-white/60">{experienceHighlight.line}</p>
+            </div>
+          </div>
 
           <ol className="mt-10 border-l border-white/10">
             {experience.map((job) => (
