@@ -79,6 +79,44 @@ export const headlineProof: Proof[] = [
 
 export const caseStudies: CaseStudy[] = [
   {
+    name: "GPUx402",
+    role: "Creator · SDK, gateway & dashboard",
+    period: "2026",
+    chain: "Lium · Bittensor SN51",
+    cover: "/work/gpux402.webp",
+    summary: "Rent GPUs from TypeScript, or let AI agents pay for compute through an x402 gateway.",
+    detail:
+      "Built the typed Lium SDK, payment gateway, agent tools and Next.js dashboard. The SDK handles node selection, boot polling, SSH execution and spend caps; the gateway tracks rentals and settlement in a SQLite ledger.",
+    stack: ["TypeScript", "Node.js", "Hono", "SQLite", "Docker", "Next.js"],
+    proof: [
+      { label: "gpu402@0.2.0 listed in Lium’s community clients", href: "https://docs.lium.io/developers#community-clients" },
+      { label: "Published on npm as gpu402", href: "https://www.npmjs.com/package/gpu402" },
+      { label: "SDK, SSH and gateway lifecycle tests", href: "https://github.com/GPU402/gpu402" },
+      { label: "Gateway demo uses testnet payments" },
+    ],
+    live: "https://gpu402.vercel.app",
+    code: "https://github.com/GPU402/gpu402",
+    caseStudy: "https://labs.web3spell.fun/work/gpux402",
+  },
+  {
+    name: "Zhi",
+    role: "Builder · contracts, Rust harness & web",
+    period: "2026",
+    chain: "Injective EVM · testnet",
+    cover: "/work/zhi.png",
+    summary: "AI trading strategies with signed rules and onchain risk limits. The model plans; deterministic code checks execution.",
+    detail:
+      "A Next.js strategy compiler, deterministic Rust harness and Solidity guardrail vault on Injective EVM testnet. Signed rule trees constrain agent actions; the repository documents tests and remaining live-integration checks.",
+    stack: ["Rust", "Solidity", "Next.js", "EIP-712", "ERC-8004"],
+    proof: [
+      { label: "Web demo on Injective EVM testnet" },
+      { label: "Source, tests and validation status", href: "https://github.com/zhi-finance/zhi#status-what-is-verified" },
+      { label: "Zhi Finance on GitHub", href: "https://github.com/zhi-finance" },
+    ],
+    live: "https://zhifi.vercel.app",
+    code: "https://github.com/zhi-finance/zhi",
+  },
+  {
     name: "ChainPot",
     role: "Founder & lead engineer",
     period: "2025 – now",
